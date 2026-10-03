@@ -1,0 +1,6 @@
+{
+  "name": "Synapse Orbit: Neural Notes & Study System",
+  "description": "Cosmic neural network notes, AI transcription, flashcards, syllabus study planner with automatic calendar scheduling and cross-platform sync.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

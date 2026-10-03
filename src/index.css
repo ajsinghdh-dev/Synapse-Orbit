@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-bg-space: #030308;
+    --color-cyan-glow: #00f5d4;
+    --color-blue-glow: #00b4d8;
+  }
+
+  body {
+    background-color: #030308;
+    color: #e2e8f0;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+  }
+
+  /* Monospace for telemetry readouts */
+  .font-hud {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-display {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+/* Custom sleek HUD scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(3, 3, 8, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 212, 0.25);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 212, 0.5);
+}
+
+/* Glowing effects */
+.glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 245, 212, 0.6), 0 0 20px rgba(0, 245, 212, 0.3);
+}
+
+.box-glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.15), inset 0 0 15px rgba(0, 245, 212, 0.05);
+}
+
+.box-glow-white {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+/* 3D Card flip for flashcards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Cosmic background canvas pattern */
+.bg-grid-hud {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
