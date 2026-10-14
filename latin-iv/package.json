@@ -1,0 +1,11 @@
+{
+  "name": "latin-iv",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "LATIN IV — Wheelock's Latin (7th ed.) Chapters 1–4 exam preparation. Static, offline-capable, no dependencies.",
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "serve": "node serve.mjs"
+  }
+}

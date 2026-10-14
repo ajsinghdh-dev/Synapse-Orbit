@@ -1,0 +1,11 @@
+{
+  "name": "LATIN IV — Wheelock Chapters 1–4",
+  "short_name": "LATIN IV",
+  "description": "Master the language. Conquer the exam.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#171A20",
+  "theme_color": "#171A20",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
