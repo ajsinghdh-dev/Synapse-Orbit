@@ -1,4 +1,5 @@
 // LATIN IV — application shell: router, navigation, theme, settings.
+import '../core/custom-boot.js';
 import { createStore } from '../core/store.js';
 import { LEXICON } from '../data/lexicon.js';
 import { $, $$, esc, icon, initMacronBar, openModal, toast, download, confirmDialog } from './util.js';

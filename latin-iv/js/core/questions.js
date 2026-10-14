@@ -123,7 +123,7 @@ function genPrincipalParts() {
   for (const w of verbs) {
     const base = { ch: w.ch, topic: 'princ-parts', rule: 'c1.ppart', vocab: [w.id], explanation: entryString(w) + (w.note ? ' ' + w.note : '') };
     out.push(finish({ ...base, id: `pp:inf:${w.id}`, diff: 1, type: 'typed', lang: 'la', prompt: `Give the present active infinitive of ${L(w.la)}.`, accept: [w.pp[1]] }));
-    out.push(finish({ ...base, id: `pp:perf:${w.id}`, diff: 2, type: 'typed', lang: 'la', prompt: `Give the perfect (third principal part) of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [w.pp[2]] }));
+    if (w.pp[2]) out.push(finish({ ...base, id: `pp:perf:${w.id}`, diff: 2, type: 'typed', lang: 'la', prompt: `Give the perfect (third principal part) of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [w.pp[2]] }));
     if (w.pp[3]) out.push(finish({ ...base, id: `pp:ptc:${w.id}`, diff: 3, type: 'typed', lang: 'la', prompt: `Give the fourth principal part of ${L(w.pp.slice(0, 3).join(', '))}.`, accept: [w.pp[3]] }));
     if (w.irreg !== 'sum') {
       const rand = rng(hash('conj:' + w.id));

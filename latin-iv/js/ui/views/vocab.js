@@ -12,7 +12,11 @@ const tag = (w) => (w.pos === 'noun' ? `${w.gender === 'mf' ? 'm./f.' : w.gender
 export const entryHtml = (w) => `<div class="la" style="font-size:24px;font-weight:600">${esc(entryText(w))}</div><div>${esc(w.en.join(', '))} <span class="tiny muted">· ${tag(w)} · Ch ${w.ch}</span></div>${w.note ? `<div class="small muted mt1">${esc(w.note)}</div>` : ''}`;
 const MODES = [['srs', 'Spaced repetition', 'Scheduled reviews that return just before you would forget.'], ['la-en', 'Latin → English', 'Type the meaning.'], ['en-la', 'English → Latin', 'Type the Latin headword.'], ['mc', 'Multiple choice', 'Pick the meaning from four.'], ['entry', 'Dictionary entry', 'Type headword plus genitive / principal parts.'], ['flash', 'Flashcards', 'Flip, then rate your recall.'], ['match', 'Match pairs', 'Pair six Latin words with meanings.'], ['form', 'From the form', 'Find the dictionary word behind an inflected form.'], ['sentence', 'In a sentence', 'Meaning of a word inside a Latin sentence.'], ['rapid', 'Rapid recall', '60 seconds, as many as you can.']];
 
-export default function vocab({ root, store, now, parts, q: Q }) {
+export default function vocab(ctx) {
+  if (ctx.parts[0] === 'add') return import('./vocab-add.js').then((m) => m.default(ctx));
+  return vocabMain(ctx);
+}
+function vocabMain({ root, store, now, parts, q: Q }) {
   const st = store.state; let cleanup = null;
   const f = { ch: Q.ch || 'all', pos: 'all', missed: false, q: '' };
   const missedIds = () => { const last = {}; st.attempts.filter((a) => a.topic === 'vocab').forEach((a) => { const id = a.qid.split(':').pop(); last[id] = a.score; }); return new Set(Object.keys(last).filter((k) => last[k] < 0.5)); };
@@ -24,10 +28,11 @@ export default function vocab({ root, store, now, parts, q: Q }) {
     const draw = () => {
       const list = filtered(true);
       root.innerHTML = `<div class="page-head"><div><h1>Vocabulary</h1><p>${LEXICON.length} words from Chapters 1–4 with full forms. Switch off anything your course has not reached; all quizzes respect it.</p></div><a class="btn primary" href="#/vocabulary/practice">${icon('play')}Practise</a></div>
-      <div class="tabs"><a href="#/vocabulary" aria-current="page">Browse</a><a href="#/vocabulary/practice">Practice modes</a></div>${filters()}
+      <div class="tabs"><a href="#/vocabulary" aria-current="page">Browse</a><a href="#/vocabulary/practice">Practice modes</a><a href="#/vocabulary/add">Add words</a></div>${filters()}
       <input class="input" id="srch" placeholder="Search Latin or English…" value="${esc(f.q)}" style="margin-bottom:var(--s3)">
-      <div class="card tight"><p class="small muted mb0" style="margin-bottom:var(--s2)">${list.length} words. Words marked <span class="badge">confirm</span> are correct Latin whose chapter should be checked against your textbook.</p>${list.map((w) => { const c = st.srs[w.id]; const off = store.isExcluded(w.id); return `<div class="wcard ${off ? 'off' : ''}"><div><div class="head">${esc(entryText(w))}</div><div class="tiny muted">${tag(w)}</div></div><div><div>${esc(w.en.join(', '))}</div>${w.note ? `<div class="small muted">${esc(w.note)}</div>` : ''}<div class="tiny muted mt1">Chapter ${w.ch}${w.conf === 'check' ? ' <span class="badge">confirm</span>' : ''} · ${c ? (c.due <= now() ? 'due for review' : 'next review in ' + Math.max(1, Math.round((c.due - now()) / DAY)) + ' d') : 'not yet studied'}</div></div><label class="switch"><input type="checkbox" data-x="${w.id}" ${off ? '' : 'checked'}> <span class="small">in my course</span></label></div>`; }).join('') || '<p class="muted">No words match.</p>'}</div>`;
+      <div class="card tight"><p class="small muted mb0" style="margin-bottom:var(--s2)">${list.length} words. Words marked <span class="badge">confirm</span> are correct Latin whose chapter should be checked against your textbook.</p>${list.map((w) => { const c = st.srs[w.id]; const off = store.isExcluded(w.id); return `<div class="wcard ${off ? 'off' : ''}"><div><div class="head">${esc(entryText(w))}</div><div class="tiny muted">${tag(w)}</div></div><div><div>${esc(w.en.join(', '))}</div>${w.note ? `<div class="small muted">${esc(w.note)}</div>` : ''}<div class="tiny muted mt1"><label>Chapter <select data-ch="${w.id}" style="font:inherit;background:var(--surface);color:inherit;border:1px solid var(--line-2);border-radius:6px">${[1, 2, 3, 4].map((n) => `<option ${n === w.ch ? 'selected' : ''}>${n}</option>`).join('')}</select></label>${w.custom ? ' <span class="badge gold">yours</span>' : ''}${w.conf === 'check' ? ' <span class="badge">confirm</span>' : ''} · ${c ? (c.due <= now() ? 'due for review' : 'next review in ' + Math.max(1, Math.round((c.due - now()) / DAY)) + ' d') : 'not yet studied'}</div></div><label class="switch"><input type="checkbox" data-x="${w.id}" ${off ? '' : 'checked'}> <span class="small">in my course</span></label></div>`; }).join('') || '<p class="muted">No words match.</p>'}</div>`;
       bindFilters(draw); $('#srch', root).oninput = (e) => { f.q = e.target.value; const pos = e.target.selectionStart; draw(); const el = $('#srch', root); el.focus(); el.setSelectionRange(pos, pos); };
+      $$('[data-ch]', root).forEach((sel) => (sel.onchange = () => { st.settings.chOverride[sel.dataset.ch] = +sel.value; store.save(true); toast('Chapter updated — reloading'); setTimeout(() => location.reload(), 400); }));
       $$('[data-x]', root).forEach((c) => (c.onchange = () => { store.setExcluded(c.dataset.x, !c.checked); draw(); }));
     };
     draw();
@@ -36,7 +41,7 @@ export default function vocab({ root, store, now, parts, q: Q }) {
   function practiceHome() {
     let mode = Q.mode || null; let size = 10;
     const draw = () => {
-      root.innerHTML = `<div class="page-head"><div><h1>Vocabulary practice</h1><p>Ten ways to retrieve a word. Retrieval — not re-reading — is what builds memory.</p></div></div><div class="tabs"><a href="#/vocabulary">Browse</a><a href="#/vocabulary/practice" aria-current="page">Practice modes</a></div>${filters()}
+      root.innerHTML = `<div class="page-head"><div><h1>Vocabulary practice</h1><p>Ten ways to retrieve a word. Retrieval — not re-reading — is what builds memory.</p></div></div><div class="tabs"><a href="#/vocabulary">Browse</a><a href="#/vocabulary/practice" aria-current="page">Practice modes</a><a href="#/vocabulary/add">Add words</a></div>${filters()}
       <div class="grid g2">${MODES.map(([k, l, d]) => `<button class="card tight" data-m="${k}" style="text-align:left;cursor:pointer;${mode === k ? 'border-color:var(--gold);background:var(--gold-soft)' : ''}"><strong>${l}</strong><div class="small muted">${d}</div></button>`).join('')}</div>
       <div class="card mt2 row between"><div class="row"><span class="lbl">Words per round</span><div class="chips">${[5, 10, 20].map((n) => `<button class="chip" data-n="${n}" aria-pressed="${size === n}">${n}</button>`).join('')}</div></div><button class="btn primary lg" id="go" ${mode ? '' : 'disabled'}>${icon('play')}Start${mode ? ' · ' + MODES.find((m) => m[0] === mode)[1] : ''}</button></div><div id="stat" class="mt2"></div>`;
       bindFilters(draw);
@@ -173,7 +178,7 @@ export default function vocab({ root, store, now, parts, q: Q }) {
     return [];
   }
   function entryFields(w) {
-    if (w.pos === 'verb') return w.pp.slice(0, w.pp[3] ? 4 : 3).map((a, i) => ({ label: ['1st sg. present', 'infinitive', 'perfect', 'participle'][i], a }));
+    if (w.pos === 'verb') return w.pp.slice(0, 4).map((a, i) => ({ label: ['1st sg. present', 'infinitive', 'perfect', 'participle'][i], a })).filter((x) => x.a);
     if (w.pos === 'noun') return [{ label: 'nominative', a: w.la }, { label: 'genitive', a: w.gen }];
     if (w.pos === 'adj') return [{ label: 'masculine', a: w.la }, { label: 'feminine', a: w.f }, { label: 'neuter', a: w.n }];
     return [{ label: 'Latin', a: w.la }];

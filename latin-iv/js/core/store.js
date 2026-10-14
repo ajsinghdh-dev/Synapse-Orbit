@@ -9,9 +9,9 @@ export const DEFAULTS = () => ({
   settings: {
     theme: 'auto', examDate: '2026-10-19', examTime: '09:00', dailyTarget: 40, macronMode: 'lenient',
     hintsInPractice: true, accommodationHints: false, timerVisible: true, newPerDay: 12,
-    weights: { quick: null, standard: null, comprehensive: null }, excluded: {},
+    weights: { quick: null, standard: null, comprehensive: null }, excluded: {}, chOverride: {},
   },
-  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, plan: { done: {} }, newToday: { day: '', ids: [] },
+  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, customWords: [], plan: { done: {} }, newToday: { day: '', ids: [] },
 });
 
 export function createStore(storage, now = () => Date.now()) {
