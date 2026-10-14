@@ -11,7 +11,7 @@ export const DEFAULTS = () => ({
     hintsInPractice: true, accommodationHints: false, timerVisible: true, newPerDay: 12,
     weights: { quick: null, standard: null, comprehensive: null }, excluded: {}, chOverride: {},
   },
-  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, customWords: [], plan: { done: {} }, newToday: { day: '', ids: [] },
+  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, savedAt: 0, customWords: [], plan: { done: {} }, newToday: { day: '', ids: [] },
 });
 
 export function createStore(storage, now = () => Date.now()) {
@@ -25,7 +25,7 @@ export function createStore(storage, now = () => Date.now()) {
   } catch { persistent = false; }
   let timer = null;
   const listeners = new Set();
-  const persist = () => { try { store.setItem(KEY, JSON.stringify(state)); persistent = true; } catch { persistent = false; } };
+  const persist = () => { try { state.savedAt = Date.now(); store.setItem(KEY, JSON.stringify(state)); persistent = true; } catch { persistent = false; } };
   const save = (immediate = false) => { listeners.forEach((f) => f()); if (immediate) { persist(); return; } clearTimeout(timer); timer = setTimeout(persist, 250); };
   const api = {
     get state() { return state; },

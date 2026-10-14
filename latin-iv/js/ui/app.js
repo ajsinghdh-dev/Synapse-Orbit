@@ -1,6 +1,7 @@
 // LATIN IV — application shell: router, navigation, theme, settings.
 import '../core/custom-boot.js';
 import { createStore } from '../core/store.js';
+import { initCloud } from '../core/cloud.js';
 import { LEXICON } from '../data/lexicon.js';
 import { $, $$, esc, icon, initMacronBar, openModal, toast, download, confirmDialog } from './util.js';
 
@@ -104,6 +105,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) store
 initMacronBar();
 applyTheme();
 route();
+initCloud(store);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !nowParam) navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__latin = { store };
 void toast; void download; void confirmDialog;

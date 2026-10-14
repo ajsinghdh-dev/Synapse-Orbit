@@ -1,5 +1,6 @@
 import { esc, icon, toast, download, confirmDialog, $ } from '../util.js';
 import { applyTheme } from '../app.js';
+import { cloud } from '../../core/cloud.js';
 
 export default function settings({ root, store }) {
   const s = store.state.settings;
@@ -21,6 +22,7 @@ export default function settings({ root, store }) {
         <label class="switch"><input type="checkbox" id="s-acc" ${s.accommodationHints ? 'checked' : ''}> Accommodation: allow hints during mock exams</label>
         <label class="switch"><input type="checkbox" id="s-timer" ${s.timerVisible ? 'checked' : ''}> Show the timer in mock exams</label>
       </section>
+      <section class="card col"><h3>Account sync</h3><p class="small mb0" id="cl"></p><p class="small muted mb0">Your progress is saved to your Claude account and shared by every device you open this page on (iPad, Mac, phone). If two devices change at once, the most recent save wins.</p><div class="row"><button class="btn" id="sync">Sync now</button></div></section>
       <section class="card col"><h3>Your data</h3>
         <p class="small muted">${store.persistent ? 'Saved in this browser on this device.' : '<strong style="color:var(--bad)">Storage is unavailable (private window?)</strong> — progress will be lost when you close the tab. Export a backup below.'} Export a backup file to move your progress between devices.</p>
         <div class="row"><button class="btn" id="exp">${icon('arrow')}Export backup</button><label class="btn" style="cursor:pointer">Import backup<input id="imp" type="file" accept="application/json" hidden></label></div>
@@ -32,6 +34,8 @@ export default function settings({ root, store }) {
         <p class="small muted mb0">Not sure a word is in your course? Chapter placement is marked <span class="badge">confirm</span> where it should be checked against your textbook.</p>
       </section>
     </div>`;
+  const paint = () => { const el = $('#cl', root); if (el) el.innerHTML = `<strong>${esc(cloud.msg)}</strong>${cloud.at ? ' · ' + new Date(cloud.at).toLocaleTimeString() : ''}`; };
+  paint(); cloud.subs.add(paint); $('#sync', root).onclick = () => cloud.syncNow();
   const on = (sel, ev, f) => $(sel, root).addEventListener(ev, f);
   on('#s-date', 'change', (e) => { if (e.target.value) { store.setSetting('examDate', e.target.value); toast('Exam date saved'); } });
   on('#s-time', 'change', (e) => { if (e.target.value) { store.setSetting('examTime', e.target.value); toast('Exam time saved'); } });
@@ -45,4 +49,5 @@ export default function settings({ root, store }) {
   on('#exp', 'click', () => download(`latin-iv-backup-${new Date(store.now()).toISOString().slice(0, 10)}.json`, store.export()));
   on('#imp', 'change', async (e) => { const f = e.target.files[0]; if (!f) return; try { store.import(await f.text()); applyTheme(); toast('Backup restored'); location.hash = '#/dashboard'; } catch (err) { toast(err.message); } });
   on('#reset', 'click', async () => { if (await confirmDialog({ title: 'Reset all progress?', body: 'This permanently deletes your attempts, spaced-repetition schedule, mistake bank and mock results on this device. Export a backup first if unsure.', ok: 'Delete everything', danger: true })) { store.reset(); toast('Progress reset'); location.hash = '#/dashboard'; } });
+  return () => cloud.subs.delete(paint);
 }
