@@ -25,7 +25,7 @@ export const NAV = [
 const VIEWS = {
   dashboard: () => import('./views/dashboard.js'), study: () => import('./views/study.js'), vocabulary: () => import('./views/vocab.js'), grammar: () => import('./views/grammar.js'),
   translation: () => import('./views/translation.js'), practice: () => import('./views/practice.js'), mock: () => import('./views/mock.js'), mistakes: () => import('./views/mistakes.js'),
-  progress: () => import('./views/progress.js'), reference: () => import('./views/reference.js'), settings: () => import('./views/settings.js'),
+  progress: () => import('./views/progress.js'), games: () => import('./views/games.js'), reference: () => import('./views/reference.js'), settings: () => import('./views/settings.js'),
 };
 
 export function applyTheme() {

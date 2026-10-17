@@ -198,3 +198,14 @@ hr.sep { border: 0; border-top: 1px solid var(--line); margin: var(--s4) 0; }
 h1,h2,h3,.display,.count .n,.ring text,.stat b,.pct,.ch-card .pct { font-variant-numeric: lining-nums; font-feature-settings: 'lnum' 1; }
 @media (max-width: 1023px) { .app { align-content: start; grid-template-rows: auto 1fr; } .main { align-self: start; } }
 @media (max-width: 640px) { #grid td { padding: 6px 4px; } #grid th { padding: 6px; font-size: 10px; } #grid .input { padding: 8px 6px; font-size: 17px; min-height: 44px; } }
+/* ---------- Legion Rush ---------- */
+.arena { padding: var(--s4); overflow: hidden; } .fighters { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: var(--s3); min-height: 150px; }
+.fh { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ink); } .fh.foe { color: var(--bad); } .fh svg { max-width: 100%; height: auto; }
+.fh.hit svg { animation: gm-shake .35s; } @keyframes gm-shake { 20% { transform: translateX(-8px) rotate(-3deg); } 60% { transform: translateX(8px) rotate(3deg); } }
+.hearts { font-size: 20px; letter-spacing: 2px; } .hpbar { width: 120px; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; } .hpbar i { display: block; height: 100%; background: var(--bad); transition: width .3s var(--ease); }
+.vs { position: relative; width: 90px; height: 100px; } .float { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font: 700 20px var(--font-display); white-space: nowrap; animation: gm-float .9s ease-out forwards; text-shadow: 0 1px 0 var(--bg); }
+.float.dmg { color: var(--gold-ink); } .float.crit { color: var(--gold-ink); font-size: 26px; } .float.miss { color: var(--bad); } .float.bonus { color: var(--ok); bottom: 50px; }
+@keyframes gm-float { to { transform: translate(-50%, -70px); opacity: 0; } }
+.tbar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: var(--s3); } .tbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); width: 100%; } .tbar i.low { background: var(--bad); } .tbar i.ice { background: #6FA8C7; }
+.gm.flash .arena { box-shadow: inset 0 0 0 3px var(--bad), var(--shadow); } .gm .opt { min-height: 56px; }
+@media (max-width: 640px) { .fighters { grid-template-columns: 1fr 70px 1fr; } .hpbar { width: 90px; } .fh svg { width: 80px; } }

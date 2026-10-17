@@ -77,7 +77,7 @@ export default function practice({ root, store, now, q: Q, parts }) {
   const seg = (key, opts, cur) => `<div class="chips" data-k="${key}">${opts.map(([v, l]) => `<button class="chip" aria-pressed="${String(cur) === String(v)}" data-v="${v}">${l}</button>`).join('')}</div>`;
   let cleanup = null;
   const draw = () => {
-    root.innerHTML = `<div class="page-head"><div><h1>Practice Tests</h1><p>Choose what to practise. Adaptive mode steers toward what you keep missing and stops repeating what you have mastered.</p></div></div>
+    root.innerHTML = `<div class="page-head"><div><h1>Practice Tests</h1><p>Choose what to practise. Adaptive mode steers toward what you keep missing and stops repeating what you have mastered.</p></div><a class="btn" href="#/games">${icon('bolt')}Play Legion Rush</a></div>
     ${st.inprogress.practice ? `<div class="card soft mb0" style="margin-bottom:var(--s4)"><div class="row between"><span>You have an unfinished session.</span><a class="btn" href="#/practice/run">Resume</a></div></div>` : ''}
     <div class="card col" style="gap:var(--s5)">
       <div><div class="lbl">Chapters</div><div class="chips mt1" data-k="ch">${[['all', 'All mixed'], [1, 'Chapter 1'], [2, 'Chapter 2'], [3, 'Chapter 3'], [4, 'Chapter 4']].map(([v, l]) => `<button class="chip" data-v="${v}" aria-pressed="${v === 'all' ? cfg.chapters === 'all' : cfg.chapters !== 'all' && cfg.chapters.includes(v)}">${l}</button>`).join('')}</div></div>

@@ -11,7 +11,7 @@ export const DEFAULTS = () => ({
     hintsInPractice: true, accommodationHints: false, timerVisible: true, newPerDay: 12,
     weights: { quick: null, standard: null, comprehensive: null }, excluded: {}, chOverride: {},
   },
-  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, savedAt: 0, customWords: [], plan: { done: {} }, newToday: { day: '', ids: [] },
+  attempts: [], srs: {}, mistakes: {}, sessions: [], mocks: [], inprogress: { mock: null }, xp: 0, game: { best: 0, plays: [] }, savedAt: 0, customWords: [], plan: { done: {} }, newToday: { day: '', ids: [] },
 });
 
 export function createStore(storage, now = () => Date.now()) {

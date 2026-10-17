@@ -67,6 +67,8 @@ export default function dashboard({ root, store, now, activeIds }) {
 
       ${(resumeMock || resumePrac) ? `<section class="card mt2 soft"><div class="row between"><div><strong>Resume previous session</strong><div class="small muted">${resumeMock ? `Mock exam (${esc(resumeMock.fmt)}) — ${Object.keys(resumeMock.answers || {}).length} of ${resumeMock.ids.length} answered` : `Practice — question ${resumePrac.idx + 1} of ${resumePrac.ids.length}`}</div></div><a class="btn" href="${resumeMock ? '#/mock/run' : '#/practice/run'}">Resume ${icon('arrow')}</a></div></section>` : ''}
 
+      <a class="card mt2 soft" href="#/games" style="text-decoration:none;color:inherit;display:block"><div class="row between"><div><div class="caps">Take a break that still counts</div><strong class="display" style="font-size:22px">Legion Rush</strong> <span class="small muted">— fight waves of enemies with your Latin${st.game && st.game.best ? ' · high score ' + st.game.best : ''}</span></div><span class="btn sm">Play ${icon('arrow')}</span></div></a>
+
       <h2 class="mt4" style="margin-bottom:var(--s3)">Chapter mastery</h2>
       <div class="grid g4">${chs.map(({ c, s }) => `
         <a class="card ch-card ${s.acc == null ? 'empty' : ''}" href="#/practice?ch=${c.n}&len=10&diff=adaptive&start=1" style="text-decoration:none;color:inherit" aria-label="Chapter ${c.n}">
