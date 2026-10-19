@@ -5,6 +5,7 @@ import { BY_ID } from '../data/lexicon.js';
 import { shuffle } from '../core/questions.js';
 import { buildKeyRegexes } from '../core/sentences.js';
 import { $, esc, fmt, la, optHtml, icon } from './util.js';
+import { mascot, SAYINGS } from './mascot.js';
 
 export const diffDots = (d) => `<span title="Difficulty ${d} of 3" aria-label="difficulty ${d} of 3">${[1, 2, 3].map((i) => `<span class="dot${i <= d ? ' ok' : ''}" style="${i <= d ? 'background:var(--gold)' : ''};margin-right:2px"></span>`).join('')}</span>`;
 export const qBadges = (q) => `<span class="badge gold">Chapter ${q.ch}</span><span class="badge">${esc(TOPICS[q.topic]?.label || q.topic)}</span>${diffDots(q.diff)}`;
@@ -34,7 +35,8 @@ export function feedbackHtml(q, res, ans) {
   }
   const ok = res.status === 'correct';
   const head = ok ? 'Correct' : res.status === 'partial' ? 'Partly right' : res.macronOnly ? 'Almost — the macron matters here' : 'Not quite';
-  parts.push(`<div class="banner ${ok ? 'ok' : res.status === 'partial' || res.macronOnly ? 'warn' : 'bad'}"><strong>${head}.</strong>${res.note ? ' <span class="ink">' + esc(res.note) + '</span>' : ''}${res.close && !ok ? ' <span class="ink">You were very close — check spelling and macrons.</span>' : ''}</div>`);
+  const sy = ok ? SAYINGS.cheer[Math.floor(Math.random() * 3)] : SAYINGS.oops[Math.floor(Math.random() * 2)];
+  parts.push(`<div class="banner fb-say ${ok ? 'ok' : res.status === 'partial' || res.macronOnly ? 'warn' : 'bad'}">${mascot(ok ? 'cheer' : 'oops', 64)}<div><strong>${head}.</strong> <span class="la" style="opacity:.85">${sy[0]}</span>${res.note ? ' <span class="ink">' + esc(res.note) + '</span>' : ''}${res.close && !ok ? ' <span class="ink">You were very close — check spelling and macrons.</span>' : ''}</div></div>`);
   if (!ok) {
     const shown = q.type === 'typed' && q.lang === 'la' ? q.accept.map((a) => la(a)).join(' <span class="muted">or</span> ') : q.type === 'compose' ? la(q.ref) : q.type === 'typed' ? esc(q.accept.slice(0, 3).join(' / ')) : optHtml(String(q.answer));
     parts.push(`<div class="small">${ans ? `Your answer: <strong>${q.type === 'compose' || (q.type === 'typed' && q.lang === 'la') ? la(ans) : esc(ans)}</strong><br>` : ''}Correct answer: <strong>${shown}</strong></div>`);

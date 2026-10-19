@@ -3,6 +3,7 @@ import { Q_BY_ID, shuffle } from '../../core/questions.js';
 import { newGame, resolve, enemyHp, enemyName, timeLimit, MAX_LIVES } from '../../core/game.js';
 import { TOPICS } from '../../data/curriculum.js';
 import { esc, fmt, optHtml, icon, $, $$, toast } from '../util.js';
+import { mascot } from '../mascot.js';
 
 let audio = null;
 const tone = (f, d = 0.12, type = 'triangle', v = 0.05) => { try { audio ||= new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain(); o.type = type; o.frequency.value = f; g.gain.value = v; o.connect(g); g.connect(audio.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d); o.stop(audio.currentTime + d); } catch { /* sound is optional */ } };
@@ -35,7 +36,7 @@ export default function games({ root, store, now, q: Q }) {
     const hearts = () => Array.from({ length: Math.max(g.lives, 0) }, () => '<span style="color:var(--bad)">♥</span>').join('') + Array.from({ length: MAX_LIVES - Math.max(g.lives, 0) }, () => '<span style="opacity:.2">♥</span>').join('');
     const frame = () => {
       root.innerHTML = `<div class="gm" id="gm"><div class="row between"><span class="caps">Wave ${g.wave} · ${esc(enemyName(g.wave))}</span><button class="btn quiet sm" id="quit">Retreat</button></div>
-      <div class="arena card"><div class="fighters"><div class="fh" id="me">${hero}<div class="hearts" id="hearts"></div></div><div class="vs" id="fx"></div><div class="fh foe" id="foe">${foe(g.wave)}<div class="hpbar"><i id="hp"></i></div><div class="tiny muted"><span id="hpn"></span></div></div></div>
+      <div class="arena card"><div class="fighters"><div class="fh" id="me">${mascot('happy', 84)}<div class="hearts" id="hearts"></div></div><div class="vs" id="fx"></div><div class="fh foe" id="foe">${foe(g.wave)}<div class="hpbar"><i id="hp"></i></div><div class="tiny muted"><span id="hpn"></span></div></div></div>
         <div class="row between" style="margin-top:var(--s2)"><span class="small">Score <strong id="sc" class="display" style="font-size:22px"></strong></span><span class="small">Streak <strong id="stk"></strong></span><span class="row tight"><button class="btn sm" id="frz"></button><button class="btn sm" id="f5"></button></span></div>
         <div class="tbar"><i id="tb"></i></div></div>
       <div id="qa" class="card mt2"></div></div>`;
@@ -87,7 +88,7 @@ export default function games({ root, store, now, q: Q }) {
       const best = Math.max(st.game.best, g.score); const isBest = g.score > st.game.best;
       if (g.answered) { st.game.plays.push({ t: now(), score: g.score, wave: g.wave }); if (st.game.plays.length > 20) st.game.plays.shift(); st.game.best = best; store.save(true); }
       const uniq = [...new Map(missed.map((m) => [m.id, m])).values()].slice(0, 6);
-      root.innerHTML = `<div class="card"><div class="inscr">${g.over ? 'Cecidistī' : 'Receptus'}</div><h2 class="mt1">${g.over ? 'Defeated on wave ' + g.wave : 'You retreated on wave ' + g.wave}</h2>${isBest && g.answered ? '<p><span class="badge gold">New high score</span></p>' : ''}
+      root.innerHTML = `<div class="card">${mascot(g.over ? 'oops' : 'happy', 90)}<div class="inscr">${g.over ? 'Cecidistī' : 'Receptus'}</div><h2 class="mt1">${g.over ? 'Defeated on wave ' + g.wave : 'You retreated on wave ' + g.wave}</h2>${isBest && g.answered ? '<p><span class="badge gold">New high score</span></p>' : ''}
       <div class="row mt2" style="gap:var(--s6)"><div class="stat"><b>${g.score}</b><span>score</span></div><div class="stat"><b>${g.wave - 1}</b><span>enemies defeated</span></div><div class="stat"><b>${g.answered ? Math.round(g.correct / g.answered * 100) + '%' : '—'}</b><span>accuracy</span></div><div class="stat"><b>${g.best}</b><span>best streak</span></div></div>
       ${uniq.length ? `<h3 class="mt3">Review what got through</h3><div class="list mt1">${uniq.map((m) => `<div class="small">${fmt(m.prompt)}<br><strong>${optHtml(m.answer)}</strong> — ${fmt(m.explanation)}</div>`).join('')}</div><p class="small muted mt1">All misses are saved in your Mistake Bank.</p>` : '<p class="mt2">Flawless defence.</p>'}
       <div class="row mt3"><button class="btn primary" id="again">Fight again</button><a class="btn" href="#/games">Menu</a><a class="btn quiet" href="#/mistakes">Mistake Bank</a></div></div>`;

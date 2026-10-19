@@ -108,7 +108,7 @@ function genVocab() {
     if (pool.length >= 3) {
       const dis = pick(pool, rand, 6);
       const opts = mcqOptions(disp(w), dis.map(disp), rand, { stripUnique: false });
-      if (opts) out.push(finish({ id: `v:mc:${w.id}`, ch: w.ch, topic: 'vocab', diff: 1, type: 'mcq', prompt: `What does ${L(w.la)} mean?`, options: opts, answer: disp(w), explanation: entryString(w) + (w.note ? ' ' + w.note : ''), rule: 'vocab', vocab: [w.id, ...dis.map((d) => d.id).filter((id) => opts.includes(disp(BY_ID[id])))] }));
+      if (opts) out.push(finish({ id: `v:mc:${w.id}`, ch: w.ch, topic: 'vocab', diff: 1, type: 'mcq', prompt: `What does ${L(w.la)} mean?`, options: opts, answer: disp(w), explanation: entryString(w) + (w.note ? '. ' + w.note : '.'), rule: 'vocab', vocab: [w.id, ...dis.map((d) => d.id).filter((id) => opts.includes(disp(BY_ID[id])))] }));
     }
     // English → Latin typed (any lexeme sharing the displayed gloss is accepted)
     const gloss = w.en[0];

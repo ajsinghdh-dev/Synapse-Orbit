@@ -4,6 +4,7 @@ import { ERR_LABEL, startOfDay } from '../../core/analytics.js';
 import { runPractice } from './practice.js';
 import { esc, fmt, la, icon, $, optHtml } from '../util.js';
 import { qBadges, ruleBox } from '../qrun.js';
+import { mascot } from '../mascot.js';
 
 export default function mistakes({ root, store, now, q: Q }) {
   const st = store.state; let cleanup = null;
@@ -21,7 +22,7 @@ export default function mistakes({ root, store, now, q: Q }) {
       <div class="qprompt" style="font-size:17px;margin-bottom:var(--s2)">${q.type === 'translate' ? 'Translate: <span class="la">' + esc(q.sent.la) + '</span>' : fmt(q.prompt)}</div>
       <div class="small">Your answer: <strong>${last?.ans ? (q.type === 'typed' && q.lang === 'la' || q.type === 'compose' ? la(last.ans) : esc(last.ans)) : '<span class="muted">(blank)</span>'}</strong> · Correct: <strong>${correctText(q)}</strong></div>
       <details class="rule mt1"><summary>Explanation</summary><div class="body">${fmt(q.explanation)}</div>${ruleBox(q.rule)}</details>
-      <div class="tiny muted mt1">Missed ${m.count}× · first ${new Date(m.first).toLocaleDateString()} · last ${new Date(m.last).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${m.status === 'open' && m.streakOk ? ` · ${m.streakOk} correct since` : ''}</div></article>`; }).join('') : `<div class="card empty"><span class="inscr">Per aspera ad astra</span><p class="mb0">${f.status === 'open' ? 'No open mistakes here. Nice.' : 'Nothing to show for these filters.'}</p></div>`}`;
+      <div class="tiny muted mt1">Missed ${m.count}× · first ${new Date(m.first).toLocaleDateString()} · last ${new Date(m.last).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${m.status === 'open' && m.streakOk ? ` · ${m.streakOk} correct since` : ''}</div></article>`; }).join('') : `<div class="card empty">${mascot('cheer', 90)}<span class="inscr">Per aspera ad astra</span><p class="mb0">${f.status === 'open' ? 'No open mistakes here. Nice.' : 'Nothing to show for these filters.'}</p></div>`}`;
     root.querySelectorAll('[data-s]').forEach((b) => (b.onclick = () => { f.status = b.dataset.s; draw(); }));
     $('#fch', root).onchange = (e) => { f.ch = e.target.value; draw(); }; $('#fk', root).onchange = (e) => { f.kind = e.target.value; draw(); };
     const re = $('#re', root); if (re) re.onclick = () => start();

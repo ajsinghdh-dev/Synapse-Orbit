@@ -3,6 +3,7 @@ import { CHAPTERS } from '../../data/lexicon.js';
 import { TOPICS } from '../../data/curriculum.js';
 import { Q_BY_ID } from '../../core/questions.js';
 import { esc, fmt, icon, pct, plural, ago, $, openModal, toast } from '../util.js';
+import { mascot } from '../mascot.js';
 
 const COMP_LABEL = { vocab: 'Vocabulary retrieval', grammar: 'Grammar accuracy', translation: 'Translation', mixed: 'Mixed questions', retention: 'Retention over repeats', mock: 'Timed mock exams' };
 
@@ -40,7 +41,8 @@ export default function dashboard({ root, store, now, activeIds }) {
     const chs = CHAPTERS.map((c) => ({ c, s: chapterStats(st, t, c.n, act) }));
 
     root.innerHTML = `
-      <div class="page-head"><div><div class="inscr">Repetītiō māter studiōrum</div><h1 class="mt1">Today</h1><p>What to study right now to move your exam score the most.</p></div>
+      <div class="hello">${mascot(st.attempts.length ? 'happy' : 'cheer', 92)}<div class="grow"><div class="inscr">Salvē, discipule!</div><h2 class="mt1">${st.attempts.length ? `Welcome back. ${streak(st, t) ? streak(st, t) + '-day streak — keep it going!' : 'Ready for today’s lesson?'}` : 'I’m Lupulus. Let’s get you ready!'}</h2><p>${esc(ms.primary.title)}</p></div></div>
+      <div class="page-head"><div><h1>Today</h1><p>What to study right now to move your exam score the most.</p></div>
         <div class="row" style="gap:var(--s5)"><div class="statchips" aria-label="Your stats"><span class="statchip fire" title="Day streak">${icon('flame')}${streak(st, t)}</span><span class="statchip xp" title="XP">${icon('bolt')}${st.xp}</span><span class="statchip goal" title="Today’s questions">${icon('target')}${today}/${target}</span></div><button class="btn primary lg" id="quick">${icon('play')}Quick Start</button></div></div>
 
       <div class="hero">
@@ -72,7 +74,7 @@ export default function dashboard({ root, store, now, activeIds }) {
       <h2 class="mt4" style="margin-bottom:var(--s3)">Chapter mastery</h2>
       <div class="grid g4">${chs.map(({ c, s }) => `
         <a class="card ch-card ${s.acc == null ? 'empty' : ''}" href="#/practice?ch=${c.n}&len=10&diff=adaptive&start=1" style="text-decoration:none;color:inherit" aria-label="Chapter ${c.n}">
-          <div class="num">Chapter ${c.n}</div><div class="display" style="font-size:17px;line-height:1.2;margin-top:-6px">${esc(c.title)}</div>
+          <div class="row" style="flex-wrap:nowrap"><span class="ch-ico c${c.n}">${['I', 'II', 'III', 'IV'][c.n - 1]}</span><div><div class="num caps">Chapter ${c.n}</div><div style="font-weight:800;line-height:1.2">${esc(c.title)}</div></div></div>
           <div class="pct">${s.acc == null ? '—' : pct(s.acc)}</div>
           <div class="meter"><div class="top"><span class="muted">Completion</span><span>${pct(s.completion)}</span></div><div class="bar"><i style="width:${s.completion * 100}%"></i></div></div>
           <div class="small">${s.weak.length ? '<span class="muted">Weak:</span> ' + s.weak.map((w) => esc(w.label)).join(', ') : '<span class="muted">' + (s.n < 5 ? 'No weak areas measured yet' : 'No weak areas flagged') + '</span>'}</div>
@@ -92,7 +94,7 @@ export default function dashboard({ root, store, now, activeIds }) {
       </div>
 
       <section class="card mt3"><div class="card-head"><h3>Recent mistakes</h3><a class="small" href="#/mistakes">Open Mistake Bank${open.length ? ` (${open.length})` : ''}</a></div>
-        ${open.length ? `<div class="list">${open.slice(0, 5).map((m) => { const q = Q_BY_ID[m.qid]; return q ? `<div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><span class="small" style="min-width:0">${fmt(q.type === 'translate' ? 'Translate: ' + q.sent.la : q.prompt)}</span><span class="tiny muted nowrap">${ago(m.last, t)}</span></div>` : ''; }).join('')}</div>` : `<div class="empty"><span class="inscr">Labor omnia vincit</span><p class="mb0">No open mistakes. Mistakes you make will be collected here with the correct answer and explanation.</p></div>`}
+        ${open.length ? `<div class="list">${open.slice(0, 5).map((m) => { const q = Q_BY_ID[m.qid]; return q ? `<div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><span class="small" style="min-width:0">${fmt(q.type === 'translate' ? 'Translate: ' + q.sent.la : q.prompt)}</span><span class="tiny muted nowrap">${ago(m.last, t)}</span></div>` : ''; }).join('')}</div>` : `<div class="empty">${mascot('sleep', 80)}<span class="inscr">Labor omnia vincit</span><p class="mb0">No open mistakes. Mistakes you make will be collected here with the correct answer and explanation.</p></div>`}
       </section>`;
 
     root.querySelector('#quick').onclick = () => { location.hash = ms.primary.id === 'diag' ? ms.primary.href : '#/practice?ch=all&len=10&diff=adaptive&start=1'; };

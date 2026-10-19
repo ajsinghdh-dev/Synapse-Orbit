@@ -4,6 +4,7 @@ import { TOPICS } from '../../data/curriculum.js';
 import { ERR_LABEL } from '../../core/analytics.js';
 import { mountQuestion, ruleBox } from '../qrun.js';
 import { esc, icon, pct, $, fmt } from '../util.js';
+import { say, confetti } from '../mascot.js';
 
 const CHOICES = { section: [['everything', 'Everything'], ['vocabulary', 'Vocabulary'], ['grammar', 'Grammar'], ['translation', 'Translation'], ['conjugation', 'Conjugation'], ['declension', 'Declension']], diff: [['1', 'Foundation'], ['2', 'Standard'], ['3', 'Challenging'], ['adaptive', 'Adaptive']], len: [5, 10, 20, 40] };
 
@@ -23,7 +24,8 @@ export function runPractice(root, { store, ids, title, mode = 'practice', onDone
     const tot = S.results.reduce((s, r) => s + r.score, 0);
     const misses = S.results.filter((r) => r.score < 0.5);
     const kinds = misses.map((r) => store.state.mistakes[r.qid]?.kind).filter(Boolean);
-    root.innerHTML = `<div class="card"><div class="inscr">Opus perfectum</div><h2 class="mt1">Session complete</h2>
+    const accN = S.results.length ? tot / S.results.length : 0; if (accN >= 0.7) setTimeout(() => confetti(), 50);
+    root.innerHTML = `<div class="card">${say(accN >= 0.7 ? 'cheer' : 'happy', accN >= 0.7 ? 'done' : 'oops')}<h2 class="mt1">Session complete</h2>
       <div class="row mt2" style="gap:var(--s6)"><div class="stat"><b>${S.results.length ? pct(tot / S.results.length) : '—'}</b><span>accuracy</span></div><div class="stat"><b>${S.results.filter((r) => r.score >= 1).length}/${S.results.length}</b><span>fully correct</span></div></div>
       <div class="mt3">${rows.map((r) => `<div class="barrow"><span>${esc(topicLabel(r.t))}</span><div class="bar"><i class="${r.acc < 0.6 ? 'low' : r.acc >= 0.85 ? 'hi' : ''}" style="width:${r.acc * 100}%"></i></div><span class="right">${pct(r.acc)}</span></div>`).join('')}</div>
       ${misses.length ? `<p class="small mt2">${misses.length} missed — saved to the Mistake Bank. ${['gap', 'slip'].map((k) => { const n = kinds.filter((x) => x === k).length; return n ? `<span class="badge ${k === 'gap' ? 'bad' : 'gold'}">${n} × ${ERR_LABEL[k].toLowerCase()}</span>` : ''; }).join(' ')}</p>` : '<p class="mt2">No misses. Well done.</p>'}
