@@ -36,22 +36,22 @@ test('compose grader accepts the reference answers and alternative word orders',
 });
 
 test('compose grader accepts any word order and reports the specific error otherwise', () => {
-  const c = COMPOSE.find((x) => x.ref === 'Puella rēgīnam amat.');
-  for (const s of ['Amat puella rēgīnam', 'rēgīnam amat puella', 'puella amat rēgīnam.']) assert.ok(gradeCompose(s, c.slots).correct, s);
-  let r = gradeCompose('Puella rēgīna amat', c.slots);       // nominative object
+  const c = COMPOSE.find((x) => x.ref === 'Puella rosam amat.');
+  for (const s of ['Amat puella rosam', 'rosam amat puella', 'puella amat rosam.']) assert.ok(gradeCompose(s, c.slots).correct, s);
+  let r = gradeCompose('Puella rosa amat', c.slots);       // nominative object
   assert.equal(r.correct, false); assert.match(r.messages.join(' '), /accusative/);
-  r = gradeCompose('Puella rēgīnam amant', c.slots);          // wrong number
+  r = gradeCompose('Puella rosam amant', c.slots);          // wrong number
   assert.equal(r.correct, false); assert.match(r.messages.join(' '), /3rd person singular/);
-  r = gradeCompose('Puella rēgīnam', c.slots);
+  r = gradeCompose('Puella rosam', c.slots);
   assert.equal(r.correct, false); assert.match(r.messages.join(' '), /Missing/);
-  r = gradeCompose('Rēgīna puellam amat', c.slots);           // roles reversed → wrong forms
+  r = gradeCompose('Rosa puellam amat', c.slots);           // roles reversed → wrong forms
   assert.equal(r.correct, false);
 });
 
 test('compose grader checks adjective agreement (gender, number, case)', () => {
-  const c = COMPOSE.find((x) => x.ref === 'Puella bona aquam portat.');
-  assert.ok(gradeCompose('Puella bona aquam portat', c.slots).correct);
-  const bad = gradeCompose('Puella bonus aquam portat', c.slots);
+  const c = COMPOSE.find((x) => x.ref === 'Multae puellae rosās amant.');
+  assert.ok(gradeCompose('Puellae multae rosās amant', c.slots).correct);
+  const bad = gradeCompose('Multī puellae rosās amant', c.slots);
   assert.equal(bad.correct, false); assert.match(bad.messages.join(' '), /feminine/);
   const d = COMPOSE.find((x) => x.ref === 'Dōnum bonum est.');
   assert.ok(gradeCompose('bonum dōnum est', d.slots).correct);
@@ -59,13 +59,13 @@ test('compose grader checks adjective agreement (gender, number, case)', () => {
 });
 
 test('compose grader treats missing macrons per the documented policy', () => {
-  const c = COMPOSE.find((x) => x.ref === 'Puella rēgīnam amat.');
-  // "reginam" has no ambiguity with another form → accepted
-  assert.ok(gradeCompose('Puella reginam amat', c.slots).correct);
+  const c = COMPOSE.find((x) => x.ref === 'Nautae poētam laudant.');
+  // "poetam" has no ambiguity with another form → accepted
+  assert.ok(gradeCompose('Nautae poetam laudant', c.slots).correct);
   // strict mode refuses
-  assert.equal(gradeCompose('Puella reginam amat', c.slots, { strict: true }).correct, false);
-  // nominative "puella" is exact; "regina" without macrons could be nom/abl → must be rejected as ambiguous
-  const c2 = COMPOSE.find((x) => x.ref === 'Rēgīna agricolae pecūniam dat.');
-  const r = gradeCompose('Regina agricolae pecuniam dat', c2.slots);
+  assert.equal(gradeCompose('Nautae poetam laudant', c.slots, { strict: true }).correct, false);
+  // "poeta" without macrons could be nominative poēta or ablative poētā → must be rejected as ambiguous
+  const c2 = COMPOSE.find((x) => x.ref === 'Poēta puellae rosam dat.');
+  const r = gradeCompose('Poeta puellae rosam dat', c2.slots);
   assert.equal(r.correct, false); assert.match(r.messages.join(' '), /Macrons matter/);
 });

@@ -41,7 +41,7 @@ export default function dashboard({ root, store, now, activeIds }) {
 
     root.innerHTML = `
       <div class="page-head"><div><div class="inscr">Repetītiō māter studiōrum</div><h1 class="mt1">Today</h1><p>What to study right now to move your exam score the most.</p></div>
-        <button class="btn gold lg" id="quick">${icon('bolt')}Quick Start</button></div>
+        <div class="row" style="gap:var(--s5)"><div class="statchips" aria-label="Your stats"><span class="statchip fire" title="Day streak">${icon('flame')}${streak(st, t)}</span><span class="statchip xp" title="XP">${icon('bolt')}${st.xp}</span><span class="statchip goal" title="Today’s questions">${icon('target')}${today}/${target}</span></div><button class="btn primary lg" id="quick">${icon('play')}Quick Start</button></div></div>
 
       <div class="hero">
         <section class="card gold" aria-labelledby="cd-h">

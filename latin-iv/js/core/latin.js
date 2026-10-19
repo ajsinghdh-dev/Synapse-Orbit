@@ -56,7 +56,7 @@ function declineWith(lex, shape, nomForm) {
     const full = shape.base + 'ī';
     const contracted = shape.base.slice(0, -1) + 'ī';
     out.sg.gen = lex.contractGen ? [contracted, full] : [full, contracted];
-    if (lex.type === 'ius' && lex.contractGen) out.sg.voc = [contracted];
+    if (lex.type === 'ius') out.sg.voc = [contracted];   // fīlius → fīlī (nouns in -ius always have vocative -ī)
   }
   return out;
 }
@@ -77,9 +77,11 @@ export function declineAdj(lex) {
   const type = lex.adjType; // 'us' | 'er0' (miser) | 'er1' (pulcher)
   const mk = (typeKey, nomForm, base, stem) => declineWith({ type: typeKey, stem, la: nomForm }, { end: ENDINGS[typeKey], base: stem ?? base }, nomForm);
   if (type === 'us') {
-    const base = lex.la.slice(0, -2);
+    const base = lex.stem || lex.la.slice(0, -2);
+    const m = mk('us', base + 'us', base);
+    if (lex.vocM) m.sg.voc = [lex.vocM];
     return {
-      m: mk('us', lex.la, base),
+      m,
       f: mk('a', base + 'a', base),
       n: mk('um', base + 'um', base),
     };
@@ -158,10 +160,10 @@ export function buildAnalyzer(lexicon) {
       void par;
     } else if (lex.pos === 'adj') {
       const par = declineAdj(lex);
-      for (const g of ['m', 'f', 'n']) for (const n of NUMS) for (const c of CASES) {
+      for (const g of ['m', 'f', 'n']) for (const n of (lex.plOnly ? ['pl'] : NUMS)) for (const c of CASES) {
         for (const f of par[g][n][c]) {
           // the dictionary headword (masc. nom. sg.) is a citation form available from the lexeme's own chapter
-          const cite = g === 'm' && n === 'sg' && (c === 'nom' || c === 'voc') && f === lex.la;
+          const cite = g === 'm' && (c === 'nom' || c === 'voc') && f === lex.la;
           add(f, { ...base, case: c, number: n, gender: g, ch: cite ? lex.ch : Math.max(lex.ch, g === 'm' ? 3 : g === 'n' ? 4 : 2) });
         }
       }

@@ -6,7 +6,7 @@
 // Every question is a plain object: { id, ch, topic, section, diff, est, type, prompt, answer|accept, explanation,
 //   rule, vocab, source, origin, … }.  The bank is validated by tests/bank.test.js.
 
-import { LEXICON, BY_ID, CHAPTERS } from '../data/lexicon.js';
+import { LEXICON, BY_ID, CHAPTERS, POS_LABEL } from '../data/lexicon.js';
 import { CONCEPTS } from '../data/concepts.js';
 import { TOPICS } from '../data/curriculum.js';
 import { SENTENCES, COMPOSE, analyzer } from './corpus.js';
@@ -53,7 +53,7 @@ function en3(g) {
 const PRON = ['I', 'you (sing.)', 'he/she/it', 'we', 'you (pl.)', 'they'];
 const PERS_LABEL = ['1st person singular', '2nd person singular', '3rd person singular', '1st person plural', '2nd person plural', '3rd person plural'];
 const englishForm = (lex, idx, gloss = lex.en[0]) => `${PRON[idx]} ${idx === 2 ? en3(gloss) : gloss}`;
-const verbGloss = (lex) => (lex.en[0].startsWith('be ') ? lex.en[0] : 'to ' + lex.en[0]);
+const verbGloss = (lex) => 'to ' + lex.en[0];
 
 // ------------------------------------------------------------------ explanation builders
 export function whyVerbForm(lex, idx) {
@@ -113,7 +113,7 @@ function genVocab() {
     // English → Latin typed (any lexeme sharing the displayed gloss is accepted)
     const gloss = w.en[0];
     const same = LEXICON.filter((x) => x.pos === w.pos && x.en.includes(gloss));
-    out.push(finish({ id: `v:el:${w.id}`, ch: w.ch, topic: 'vocab', diff: 2, type: 'typed', lang: 'la', prompt: `Give the Latin dictionary headword for “${w.pos === 'verb' ? verbGloss(w) : gloss}” (${w.pos === 'adj' ? 'adjective, masculine nominative' : w.pos === 'noun' ? 'noun, nominative singular' : w.pos === 'verb' ? 'verb, 1st principal part' : w.pos}).`, accept: same.map((x) => x.la), explanation: entryString(w), rule: 'vocab', vocab: same.map((x) => x.id) }));
+    out.push(finish({ id: `v:el:${w.id}`, ch: w.ch, topic: 'vocab', diff: 2, type: 'typed', lang: 'la', prompt: `Give the Latin dictionary headword for “${w.pos === 'verb' ? verbGloss(w) : gloss}” (${w.pos === 'adj' ? 'adjective, masculine nominative' : w.pos === 'noun' ? 'noun, nominative singular' : w.pos === 'verb' ? 'verb, 1st principal part' : POS_LABEL[w.pos]}).`, accept: same.map((x) => x.la), explanation: entryString(w), rule: 'vocab', vocab: same.map((x) => x.id) }));
   }
   return out;
 }
@@ -176,7 +176,7 @@ function genConjugation() {
 
 // a worked example that stays inside the chapter being tested (and is never the asked noun)
 function stemExample(w) {
-  const ex = w.ch === 2 ? [['silva', '{silvae} → {silv-}'], ['via', '{viae} → {vi-}']] : [['lupus', '{lupī} → {lup-}'], ['equus', '{equī} → {equ-}']];
+  const ex = w.ch === 2 ? [['rosa', '{rosae} → {ros-}'], ['porta', '{portae} → {port-}']] : [['amicus', '{amīcī} → {amīc-}'], ['numerus', '{numerī} → {numer-}']];
   return (ex.find(([id]) => id !== w.id) || ex[0])[1];
 }
 const NCELLS = [];
@@ -225,7 +225,7 @@ function genAgreement() {
     const cells = NCELLS.filter(([c]) => c !== 'voc');
     [h % 10, (h + 5) % 10].forEach((ci, k) => {
       const [c, n] = cells[ci];
-      const allowed = adjs.filter((a) => a.ch <= Math.max(w.ch, a.ch));
+      const allowed = adjs.filter((a) => !a.plOnly);
       const a = allowed[(h >>> (k * 3)) % allowed.length];
       const g = w.gender;
       const need = Math.max(w.ch, a.ch, g === 'm' ? 3 : g === 'n' ? 4 : 2);

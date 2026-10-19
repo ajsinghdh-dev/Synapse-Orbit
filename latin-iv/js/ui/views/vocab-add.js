@@ -6,7 +6,7 @@ import { esc, la, icon, toast, confirmDialog, $, $$ } from '../util.js';
 const EXAMPLE = `# one word per line:  entry ; meaning ; chapter ; (type, only for prepositions/conjunctions/adverbs)
 amō, amāre, amāvī, amātus ; love, like ; 1
 puella, puellae, f. ; girl ; 2
-dominus, dominī, m. ; master, lord ; 3
+amīcus, amīcī, m. ; friend ; 3
 bellum, bellī, n. ; war ; 4
 bonus, -a, -um ; good ; 2
 in ; in, on, into ; 2 ; prep+abl/acc`;

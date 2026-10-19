@@ -49,13 +49,23 @@ test('lexicon entries are well-formed', () => {
   }
 });
 
-test('chapter assignment matches grammar introduced in that chapter', () => {
+test('chapter assignment respects when each declension is taught', () => {
   for (const w of LEXICON) {
-    if (w.pos === 'noun' && w.type === 'a') assert.equal(w.ch, 2, w.id);
-    if (w.pos === 'noun' && ['us', 'ius', 'er'].includes(w.type)) assert.equal(w.ch, 3, w.id);
+    if (w.pos === 'noun' && w.type === 'a') assert.ok(w.ch >= 2, w.id);
+    if (w.pos === 'noun' && ['us', 'ius', 'er'].includes(w.type)) assert.ok(w.ch >= 3, w.id);
     if (w.pos === 'noun' && ['um', 'ium'].includes(w.type)) assert.equal(w.ch, 4, w.id);
-    if (w.pos === 'verb' && w.irreg !== 'sum') assert.equal(w.ch, 1, w.id);
   }
+});
+
+test('Wheelock-specific facts', () => {
+  assert.equal(BY_ID.amo.pp[3], 'amātum', '4th principal part is the supine');
+  assert.equal(BY_ID.valeo.pp[3], 'valitūrum');
+  assert.deepEqual(BY_ID.sum.pp, ['sum', 'esse', 'fuī', 'futūrum']);
+  assert.deepEqual(BY_ID.iuvo.pp, ['iuvō', 'iuvāre', 'iūvī', 'iūtum']);
+  assert.deepEqual(declineAdj(BY_ID.meus).m.sg.voc, ['mī']);
+  assert.equal(declineNoun(BY_ID.filius).sg.voc[0], 'fīlī');
+  for (const id of ['porto', 'pugno', 'navigo', 'regina', 'dominus', 'servus', 'oppidum', 'ad', 'cum', 'e', 'a']) assert.ok(!BY_ID[id], id + ' is not Chapter 1–4 vocabulary');
+  for (const id of ['cogito', 'erro', 'salveo', 'conservo', 'philosophia', 'sapientia', 'stultus', 'verus', 'sine', 'nihil']) assert.ok(BY_ID[id], id + ' is Chapter 1–4 vocabulary');
 });
 
 test('analyzer recognises syncretism honestly', () => {
@@ -63,6 +73,7 @@ test('analyzer recognises syncretism honestly', () => {
   const cn = (t) => new Set(an.analyze(t).map((a) => a.case + '.' + a.number));
   assert.deepEqual([...cn('puellae')].sort(), ['dat.sg', 'gen.sg', 'nom.pl', 'voc.pl']);
   assert.ok(cn('puellā').has('abl.sg') && cn('puellā').size === 1);
+  assert.ok(an.analyze('bellum').some((a) => a.lemma === 'bellus') && an.analyze('bellum').some((a) => a.lemma === 'bellum'), 'bellum is ambiguous: war / pretty');
   assert.ok(cn('bellum').has('nom.sg') && cn('bellum').has('acc.sg') && cn('bellum').has('voc.sg'));
   assert.ok(cn('bella').has('nom.pl') && cn('bella').has('acc.pl'));
   assert.ok(!cn('bella').has('abl.sg'));

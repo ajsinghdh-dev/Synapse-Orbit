@@ -12,7 +12,7 @@ import { genders, strip, CASE_NAME, NUM_NAME, GENDER_NAME } from './latin.js';
 export const ROLE_LABEL = {
   S: 'Subject', V: 'Main verb', O: 'Direct object', I: 'Indirect object', G: 'Genitive (“of”)',
   A: 'Adjective', N: 'Predicate nominative / adjective', AP: 'Apposition', P: 'Preposition',
-  PO: 'Object of preposition', VOC: 'Vocative (address)', INF: 'Complementary infinitive', C: 'Conjunction', D: 'Adverb',
+  PO: 'Object of preposition', VOC: 'Vocative (address)', INF: 'Complementary infinitive', C: 'Conjunction', D: 'Adverb', X: 'Other word',
 };
 const ROLE_CASE = { S: 'nom', N: 'nom', O: 'acc', I: 'dat', G: 'gen', VOC: 'voc' };
 const NOMINAL = new Set(['S', 'N', 'O', 'I', 'G', 'AP', 'PO', 'VOC']);
@@ -54,6 +54,9 @@ export function parseSentence(def, analyzer, byId) {
     } else if (r === 'C') {
       const c = cands.filter((a) => a.pos === 'conj');
       if (c.length !== 1) problems.push(`token “${tk.word}” as C`); else tk.analysis = c[0];
+    } else if (r === 'X') {
+      const c = cands.filter((a) => ['pron', 'indecl', 'interj'].includes(a.pos));
+      if (c.length !== 1) problems.push(`token “${tk.word}” as X`); else tk.analysis = c[0];
     } else if (r === 'D') {
       const c = cands.filter((a) => a.pos === 'adv');
       if (c.length !== 1) problems.push(`token “${tk.word}” as D`); else tk.analysis = c[0];
@@ -70,7 +73,11 @@ export function parseSentence(def, analyzer, byId) {
       }
       if (r === 'AP') { kase = tk.feat; if (!kase) { problems.push(`AP “${tk.word}” needs a case feat`); return; } }
       const c = cands.filter((a) => (a.pos === 'noun' || a.pos === 'adj') && a.case === kase);
-      const cc = c; // predicate nominals are narrowed against the subject in pass 2
+      // the same spelling can be a noun or an adjective (bellum “war” / bellum “pretty”): a nominal slot prefers the noun
+      // unless the annotation says /adj
+      let cc = c;
+      if (tk.feat === 'adj') cc = c.filter((a) => a.pos === 'adj');
+      else if (c.some((a) => a.pos === 'noun') && c.some((a) => a.pos === 'adj') && r !== 'N') cc = c.filter((a) => a.pos === 'noun');
       if (cc.length === 0) problems.push(`token “${tk.word}” as ${r}: no ${kase} analysis`);
       tk.cands = cc;
       if (cc.length === 1) tk.analysis = cc[0];

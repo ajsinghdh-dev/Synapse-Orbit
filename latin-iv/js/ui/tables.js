@@ -32,20 +32,20 @@ export function adjTable(id, { all = true } = {}) {
   return `<div class="tscroll"><table class="ptable"><thead><tr><th></th>${gens.map(([, l]) => `<th colspan="2">${l}</th>`).join('')}</tr><tr><th></th>${gens.map(() => '<th>Sg.</th><th>Pl.</th>').join('')}</tr></thead><tbody>${CASES.map((c) => `<tr><th>${CN[c].slice(0, 3)}.</th>${gens.map(([g]) => NUMS.map((n) => `<td class="la">${esc(d[g][n][c][0])}</td>`).join('')).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 export function casesTable() {
-  const rows = [['Nominative', 'subject; predicate nominative', 'Puella canit. / Poēta est vir.'], ['Genitive', 'possession — “of”', 'fīlia agricolae “the farmer’s daughter”'], ['Dative', 'indirect object — “to, for”', 'Dat puellae aquam “gives water to the girl”'], ['Accusative', 'direct object; after ad, in (into)', 'Videt puellam “sees the girl”'], ['Ablative', 'with, by, from, in — mostly with prepositions', 'cum amīcō, in agrō, ex silvā'], ['Vocative', 'direct address', 'Fīlī, audī! “Son, listen!”']];
+  const rows = [['Nominative', 'subject; predicate nominative', 'Puella rosam amat. / Poēta est vir.'], ['Genitive', 'possession — “of”', 'fāma poētae “the poet’s fame”'], ['Dative', 'indirect object — “to, for”', 'Dat puellae rosam “gives a rose to the girl”'], ['Accusative', 'direct object; after in (into)', 'Videt puellam “sees the girl”; in agrum “into the field”'], ['Ablative', 'with, by, from, in — often with prepositions', 'sine pecūniā, in agrō, dē vītā'], ['Vocative', 'direct address', 'Ō fīlī, vidē! “O son, look!”']];
   return `<div class="tscroll"><table class="ptable"><thead><tr><th>Case</th><th>Main functions</th><th>Example</th></tr></thead><tbody>${rows.map((r) => `<tr><th>${r[0]}</th><td>${esc(r[1])}</td><td class="la">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 export const TABLES = {
   'verbs-ind': () => verbTable(['amo', 'moneo']),
   'verbs-forms': () => verbFormsTable(['amo', 'laudo', 'moneo', 'video']),
-  'decl-1': () => declTable(['puella', 'agricola']),
+  'decl-1': () => declTable(['puella', 'nauta']),
   cases: casesTable,
   'adj-bonus': () => adjTable('bonus', { all: false }),
-  'decl-2m': () => declTable(['dominus', 'amicus']),
+  'decl-2m': () => declTable(['amicus', 'filius']),
   'decl-er': () => declTable(['puer', 'ager']),
   'decl-2n': () => declTable(['bellum', 'donum']),
   sum: sumTable,
-  'adj-all': () => adjTable('bonus') + '<div class="mt2"></div>' + adjTable('pulcher'),
+  'adj-all': () => adjTable('bonus'),
 };
 void PERSONS; void CASE_NAME;

@@ -75,7 +75,7 @@ test('selection respects chapter, section, difficulty and excluded vocabulary', 
   const s = createStore(null, () => NOW);
   s.setExcluded('amo', true);
   const sel = selectPractice({ chapters: [1], section: 'vocabulary', diff: '1', len: 40 }, s.state, NOW, rng(3));
-  assert.ok(sel.length > 10);
+  assert.ok(sel.length >= 5);
   for (const q of sel) { assert.equal(q.ch, 1); assert.equal(q.section, 'vocabulary'); assert.equal(q.diff, 1); assert.ok(!q.vocab.includes('amo')); }
   assert.equal(new Set(sel.map((q) => q.id)).size, sel.length, 'no repeats in a set');
   const sim = similarTo(sel[0], s.state, new Set([sel[0].id]), rng(1));
