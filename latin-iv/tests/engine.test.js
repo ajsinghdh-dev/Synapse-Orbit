@@ -90,12 +90,17 @@ test('mock exams: size, section weights, chapter coverage, no duplicate skills',
     assert.equal(new Set(m.items).size, m.items.length);
     const qs = m.items.map((id) => Q_BY_ID[id]);
     const chs = new Set(qs.map((q) => q.ch));
-    if (fmt !== 'quick') assert.equal(chs.size, 4, fmt + ' covers all four chapters');
+    if (fmt === 'comprehensive') assert.equal(chs.size, 6, fmt + ' covers all six chapters');
+    if (fmt === 'standard') assert.ok(chs.size >= 5, fmt + ' covers nearly every chapter');
     const counts = apportion(FORMATS[fmt].weights, FORMATS[fmt].n);
     for (const [sec, n] of Object.entries(counts)) assert.equal(qs.filter((q) => q.section === sec).length, n, `${fmt} ${sec}`);
   }
   const comp = buildMock('comprehensive', s.state, rng(5)).items.map((id) => Q_BY_ID[id]);
   for (let i = 1; i < comp.length; i++) assert.ok(comp[i].diff >= comp[i - 1].diff, 'comprehensive exam increases in difficulty');
+  s.state.settings.mockChapters = [5, 6];
+  const only56 = buildMock('quick', s.state, rng(4)).items.map((id) => Q_BY_ID[id]);
+  assert.ok(only56.length > 0 && only56.every((q) => q.ch === 5 || q.ch === 6), 'mock chapter selection is honoured');
+  s.state.settings.mockChapters = null;
   const custom = buildMock('standard', s.state, rng(2), { vocabulary: 1, conjugation: 0, declension: 0, grammar: 0, translation: 0 }).items.map((id) => Q_BY_ID[id]);
   assert.ok(custom.length > 0 && custom.every((q) => q.section === 'vocabulary'), 'custom weightings are honoured');
 });

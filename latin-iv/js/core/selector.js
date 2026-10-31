@@ -1,6 +1,7 @@
 // Choosing questions: the adaptive practice selector and the mock-exam builder. Pure given (state, now, rand).
 import { BANK, Q_BY_ID, shuffle, hash } from './questions.js';
 import { TOPICS } from '../data/curriculum.js';
+import { CH_LIST } from '../data/lexicon.js';
 import { wacc, qStatus } from './analytics.js';
 import { DAY } from './srs.js';
 
@@ -9,7 +10,7 @@ export const SECTION_FILTERS = {
 };
 
 export function eligible(cfg, state) {
-  const chs = cfg.chapters === 'all' || !cfg.chapters ? [1, 2, 3, 4] : cfg.chapters;
+  const chs = cfg.chapters === 'all' || !cfg.chapters ? CH_LIST : cfg.chapters;
   const secs = SECTION_FILTERS[cfg.section || 'everything'];
   const ex = state.settings.excluded;
   return BANK.filter((q) => chs.includes(q.ch) && (!secs || secs.includes(q.section)) && (!cfg.topic || q.topic === cfg.topic) && !q.vocab.some((v) => ex[v]) && (!cfg.types || cfg.types.includes(q.type)));
@@ -70,7 +71,7 @@ export function similarTo(q, state, usedIds, rand = Math.random) {
 export const FORMATS = {
   quick: { key: 'quick', label: 'Quick Test', n: 20, mins: 15, blurb: 'Mixed recall and grammar.', weights: { vocabulary: 0.30, conjugation: 0.25, declension: 0.20, grammar: 0.25, translation: 0 } },
   standard: { key: 'standard', label: 'Standard Mock Exam', n: 35, mins: 30, blurb: 'Vocabulary, conjugation, declension and translation.', weights: { vocabulary: 0.25, conjugation: 0.20, declension: 0.20, grammar: 0.15, translation: 0.20 } },
-  comprehensive: { key: 'comprehensive', label: 'Comprehensive Mock Exam', n: 50, mins: 50, blurb: 'All four chapters, increasing difficulty, answers revealed only on submission.', weights: { vocabulary: 0.20, conjugation: 0.18, declension: 0.20, grammar: 0.20, translation: 0.22 } },
+  comprehensive: { key: 'comprehensive', label: 'Comprehensive Mock Exam', n: 50, mins: 50, blurb: 'All chapters, increasing difficulty, answers revealed only on submission.', weights: { vocabulary: 0.20, conjugation: 0.18, declension: 0.20, grammar: 0.20, translation: 0.22 } },
 };
 
 export function apportion(weights, n) {
@@ -95,11 +96,12 @@ export function buildMock(fmtKey, state, rand = Math.random, weights = null) {
     let pool = BANK.filter((q) => q.section === sec && !q.vocab.some((v) => ex[v]));
     if (sec === 'translation') pool = pool.filter((q) => q.type === 'compose' || q.type === 'translate');
     // round-robin over chapters so every chapter is covered; shuffle inside each
-    const lists = [1, 2, 3, 4].map((c) => shuffle(pool.filter((q) => q.ch === c), rand));
+    const chs = weights && weights.chapters ? weights.chapters : (state.settings.mockChapters || CH_LIST);
+    const lists = chs.map((c) => shuffle(pool.filter((q) => q.ch === c), rand));
     let taken = 0, guard = 0, ci = 0;
     // translation: alternate objective (compose) and self-assessed (translate) items
     while (taken < n && guard++ < 5000) {
-      const list = lists[ci % 4]; ci++;
+      const list = lists[ci % lists.length]; ci++;
       if (!list.length) { if (lists.every((l) => !l.length)) break; continue; }
       let idx = 0;
       if (sec === 'translation') { const wantType = taken % 2 === 0 ? 'translate' : 'compose'; idx = list.findIndex((q) => q.type === wantType); if (idx < 0) idx = 0; }

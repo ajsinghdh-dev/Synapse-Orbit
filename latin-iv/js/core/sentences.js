@@ -7,7 +7,7 @@
 // The parser resolves each token to ONE contextual analysis and reports problems, so the data file
 // can be validated by tests (every word is in the lexicon, forms are real, chapters are respected).
 
-import { genders, strip, CASE_NAME, NUM_NAME, GENDER_NAME } from './latin.js';
+import { genders, strip, CASE_NAME, NUM_NAME, GENDER_NAME, TENSE_NAME } from './latin.js';
 
 export const ROLE_LABEL = {
   S: 'Subject', V: 'Main verb', O: 'Direct object', I: 'Indirect object', G: 'Genitive (“of”)',
@@ -146,7 +146,7 @@ export function tokenGloss(tk, byId) {
   const lex = byId[a.lemma];
   let desc = '';
   if (a.pos === 'verb') {
-    if (a.mood === 'ind') desc = `${['', '1st', '2nd', '3rd'][a.person]} ${NUM_NAME[a.number]} present active indicative`;
+    if (a.mood === 'ind') desc = `${['', '1st', '2nd', '3rd'][a.person]} ${NUM_NAME[a.number]} ${TENSE_NAME[a.tense || 'pres']} active indicative`;
     else if (a.mood === 'imp') desc = `${NUM_NAME[a.number]} imperative`;
     else desc = 'present active infinitive';
   } else if (a.pos === 'noun' || a.pos === 'adj') {

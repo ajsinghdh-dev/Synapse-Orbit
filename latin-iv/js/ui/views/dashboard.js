@@ -72,9 +72,9 @@ export default function dashboard({ root, store, now, activeIds }) {
       <a class="card mt2 soft" href="#/games" style="text-decoration:none;color:inherit;display:block"><div class="row between"><div><div class="caps">Take a break that still counts</div><strong class="display" style="font-size:22px">Legion Rush</strong> <span class="small muted">— fight waves of enemies with your Latin${st.game && st.game.best ? ' · high score ' + st.game.best : ''}</span></div><span class="btn sm">Play ${icon('arrow')}</span></div></a>
 
       <h2 class="mt4" style="margin-bottom:var(--s3)">Chapter mastery</h2>
-      <div class="grid g4">${chs.map(({ c, s }) => `
+      <div class="grid g3">${chs.map(({ c, s }) => `
         <a class="card ch-card ${s.acc == null ? 'empty' : ''}" href="#/practice?ch=${c.n}&len=10&diff=adaptive&start=1" style="text-decoration:none;color:inherit" aria-label="Chapter ${c.n}">
-          <div class="row" style="flex-wrap:nowrap"><span class="ch-ico c${c.n}">${['I', 'II', 'III', 'IV'][c.n - 1]}</span><div><div class="num caps">Chapter ${c.n}</div><div style="font-weight:800;line-height:1.2">${esc(c.title)}</div></div></div>
+          <div class="row" style="flex-wrap:nowrap"><span class="ch-ico c${c.n}">${['I', 'II', 'III', 'IV', 'V', 'VI'][c.n - 1]}</span><div><div class="num caps">Chapter ${c.n}</div><div style="font-weight:800;line-height:1.2">${esc(c.title)}</div></div></div>
           <div class="pct">${s.acc == null ? '—' : pct(s.acc)}</div>
           <div class="meter"><div class="top"><span class="muted">Completion</span><span>${pct(s.completion)}</span></div><div class="bar"><i style="width:${s.completion * 100}%"></i></div></div>
           <div class="small">${s.weak.length ? '<span class="muted">Weak:</span> ' + s.weak.map((w) => esc(w.label)).join(', ') : '<span class="muted">' + (s.n < 5 ? 'No weak areas measured yet' : 'No weak areas flagged') + '</span>'}</div>

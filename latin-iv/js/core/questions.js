@@ -11,7 +11,7 @@ import { CONCEPTS } from '../data/concepts.js';
 import { TOPICS } from '../data/curriculum.js';
 import { SENTENCES, COMPOSE, analyzer } from './corpus.js';
 import { ROLE_LABEL } from './sentences.js';
-import { conjugate, declineNoun, nounForm, adjForm, CASES, NUMS, CASE_NAME, NUM_NAME, GENDER_NAME, PERSONS, strip, canon, describe } from './latin.js';
+import { conjugate, declineNoun, nounForm, adjForm, CASES, NUMS, CASE_NAME, NUM_NAME, GENDER_NAME, PERSONS, TENSE_NAME, strip, canon, describe } from './latin.js';
 import { parseSlot } from './grade.js';
 
 // ------------------------------------------------------------------ helpers
@@ -54,12 +54,38 @@ const PRON = ['I', 'you (sing.)', 'he/she/it', 'we', 'you (pl.)', 'they'];
 const PERS_LABEL = ['1st person singular', '2nd person singular', '3rd person singular', '1st person plural', '2nd person plural', '3rd person plural'];
 const englishForm = (lex, idx, gloss = lex.en[0]) => `${PRON[idx]} ${idx === 2 ? en3(gloss) : gloss}`;
 const verbGloss = (lex) => 'to ' + lex.en[0];
+function ing(g) {
+  const [w, ...rest] = g.split(' ');
+  const x = /ee$/.test(w) ? w + 'ing' : /ie$/.test(w) ? w.slice(0, -2) + 'ying' : /[^e]e$/.test(w) ? w.slice(0, -1) + 'ing' : w + 'ing';
+  return [x, ...rest].join(' ');
+}
+const IRR_EN = {
+  sum: { pres: ['I am', 'you (sing.) are', 'he/she/it is', 'we are', 'you (pl.) are', 'they are'], impf: ['I was', 'you (sing.) were', 'he/she/it was', 'we were', 'you (pl.) were', 'they were'], fut: ['I will be', 'you (sing.) will be', 'he/she/it will be', 'we will be', 'you (pl.) will be', 'they will be'] },
+  possum: { pres: ['I am able', 'you (sing.) are able', 'he/she/it is able', 'we are able', 'you (pl.) are able', 'they are able'], impf: ['I was able', 'you (sing.) were able', 'he/she/it was able', 'we were able', 'you (pl.) were able', 'they were able'], fut: ['I will be able', 'you (sing.) will be able', 'he/she/it will be able', 'we will be able', 'you (pl.) will be able', 'they will be able'] },
+};
+/** English for one finite form; null when the gloss does not inflect cleanly (“be strong”). */
+export function engVerb(lex, t, idx) {
+  if (IRR_EN[lex.irreg]) return IRR_EN[lex.irreg][t][idx];
+  const g = lex.en[0]; if (g.startsWith('be ')) return null;
+  if (t === 'pres') return englishForm(lex, idx, g);
+  if (t === 'impf') return `${PRON[idx]} ${idx === 0 || idx === 2 ? 'was' : 'were'} ${ing(g)}`;
+  return `${PRON[idx]} will ${g}`;
+}
+/** Explanation of an imperfect / future form. */
+export function whyTense(lex, t, idx) {
+  const p = conjugate(lex); const form = p[t][idx];
+  if (lex.irreg === 'sum') return `${L(form)} is the ${TENSE_NAME[t]} of {sum}, ${PERS_LABEL[idx]}: ${L(p[t].join(', '))}.`;
+  if (lex.irreg === 'possum') return `${L(form)} = {pot-} + ${L(conjugate({ irreg: 'sum' })[t][idx])} (${TENSE_NAME[t]} of sum), ${PERS_LABEL[idx]}.`;
+  const e = (t === 'impf' ? ['-bam', '-bās', '-bat', '-bāmus', '-bātis', '-bant'] : ['-bō', '-bis', '-bit', '-bimus', '-bitis', '-bunt'])[idx];
+  return `${L(form)} = present stem ${L(p.stem + '-')} + ${L(e)} (${TENSE_NAME[t]}, ${PERS_LABEL[idx]}). ${t === 'impf' ? 'The sign of the imperfect is -bā-.' : 'The future sign is -b- with ō / i / u: -bō, -bi-, -bu-.'}${lex.irreg === 'do' ? ' dō keeps its short a: da-.' : ''}`;
+}
 
 // ------------------------------------------------------------------ explanation builders
 export function whyVerbForm(lex, idx) {
   const p = conjugate(lex);
   const form = p.ind[idx];
   if (lex.irreg === 'sum') return `${L(form)} is ${PERS_LABEL[idx]} of the irregular verb {sum}: {sum, es, est, sumus, estis, sunt}.`;
+  if (lex.irreg === 'possum') return `${L(form)} is ${PERS_LABEL[idx]} of {possum} = {pot-}/{pos-} + {sum}: {possum, potes, potest, possumus, potestis, possunt}.`;
   const endings = ['-ō', '-s', '-t', '-mus', '-tis', '-nt'];
   const person = PERS_LABEL[idx];
   if (lex.irreg === 'do') return `${L(form)} = {d-} + the stem vowel a + ${L(endings[idx])}: ${person}. In {dō} the a is short everywhere except {dās} (and the imperative {dā}).`;
@@ -125,7 +151,7 @@ function genPrincipalParts() {
     out.push(finish({ ...base, id: `pp:inf:${w.id}`, diff: 1, type: 'typed', lang: 'la', prompt: `Give the present active infinitive of ${L(w.la)}.`, accept: [w.pp[1]] }));
     if (w.pp[2]) out.push(finish({ ...base, id: `pp:perf:${w.id}`, diff: 2, type: 'typed', lang: 'la', prompt: `Give the perfect (third principal part) of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [w.pp[2]] }));
     if (w.pp[3]) out.push(finish({ ...base, id: `pp:ptc:${w.id}`, diff: 3, type: 'typed', lang: 'la', prompt: `Give the fourth principal part of ${L(w.pp.slice(0, 3).join(', '))}.`, accept: [w.pp[3]] }));
-    if (w.irreg !== 'sum') {
+    if (w.irreg !== 'sum' && w.irreg !== 'possum') {
       const rand = rng(hash('conj:' + w.id));
       void rand;
       out.push(finish({ ...base, id: `pp:conj:${w.id}`, diff: 1, type: 'mcq', prompt: `To which conjugation does ${L(w.pp[0] + ', ' + w.pp[1])} belong?`, options: ['1st conjugation', '2nd conjugation'], answer: w.conj === 1 ? '1st conjugation' : '2nd conjugation', explanation: `The infinitive ${L(w.pp[1])} ends in ${w.conj === 1 ? L('-āre') : L('-ēre')}, so it is ${w.conj === 1 ? '1st' : '2nd'} conjugation.${w.irreg === 'do' ? ' (dō has a short a: dare.)' : ''}`, rule: 'c1.stem' }));
@@ -138,27 +164,43 @@ function genConjugation() {
   const out = [];
   for (const w of verbs) {
     const p = conjugate(w);
-    const sum = w.irreg === 'sum';
-    const topic = sum ? 'sum' : 'verb-forms';
-    const rule = sum ? 'c4.sum' : 'c1.endings';
+    const irr = w.irreg === 'sum' || w.irreg === 'possum';
+    const sum = irr;
+    const topic = w.irreg === 'sum' ? 'sum' : w.irreg === 'possum' ? 'sum-possum' : 'verb-forms';
+    const rule = w.irreg === 'sum' ? 'c4.sum' : w.irreg === 'possum' ? 'c6.possum' : 'c1.endings';
     PERSONS.forEach(([pers, num], idx) => {
       const form = p.ind[idx];
-      out.push(finish({ id: `cf:${w.id}:${idx}`, ch: w.ch, topic, diff: idx === 0 || idx === 3 ? 1 : 2, type: 'typed', lang: 'la', prompt: `Give the ${PERS_LABEL[idx]}, present active indicative, of ${L(sum ? 'sum, esse' : w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
+      out.push(finish({ id: `cf:${w.id}:${idx}`, ch: w.ch, topic, diff: idx === 0 || idx === 3 ? 1 : 2, type: 'typed', lang: 'la', prompt: `Give the ${PERS_LABEL[idx]}, present active indicative, of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
     });
     // two identification + two translation items per verb, chosen deterministically
     const h = hash('cid:' + w.id);
     [h % 6, (h + 3) % 6].forEach((idx, k) => {
       const rand = rng(hash(`cid:${w.id}:${idx}`));
       const opts = mcqOptions(PERS_LABEL[idx], PERS_LABEL, rand);
-      out.push(finish({ id: `cid:${w.id}:${idx}`, ch: w.ch, topic: sum ? 'sum' : 'verb-id', diff: 1, type: 'mcq', prompt: `Which person and number is ${L(p.ind[idx])}? (present active indicative of ${L(w.pp[0])})`, options: opts, answer: PERS_LABEL[idx], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
+      out.push(finish({ id: `cid:${w.id}:${idx}`, ch: w.ch, topic: irr ? topic : 'verb-id', diff: 1, type: 'mcq', prompt: `Which person and number is ${L(p.ind[idx])}? (present active indicative of ${L(w.pp[0])})`, options: opts, answer: PERS_LABEL[idx], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
       void k;
-      if (w.en[0].startsWith('be ') && !sum) return;
-      const g = sum ? 'be' : w.en[0];
-      const correct = sum ? ['I am', 'you (sing.) are', 'he/she/it is', 'we are', 'you (pl.) are', 'they are'][idx] : englishForm(w, idx, g);
-      const wrong = [0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => (sum ? ['I am', 'you (sing.) are', 'he/she/it is', 'we are', 'you (pl.) are', 'they are'][i] : englishForm(w, i, g)));
-      out.push(finish({ id: `ctr:${w.id}:${idx}`, ch: w.ch, topic: sum ? 'sum' : 'verb-forms', diff: 1, type: 'mcq', prompt: `Choose the best translation of ${L(p.ind[idx])}.`, options: mcqOptions(correct, wrong, rng(hash('ctr' + w.id + idx))), answer: correct, explanation: whyVerbForm(w, idx) + ` Present tense also translates as “am/is/are ___ing”.`, rule: sum ? 'c4.sum' : 'c1.translate', vocab: [w.id] }));
+      const correct = engVerb(w, 'pres', idx); if (!correct) return;
+      const wrong = [0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => engVerb(w, 'pres', i));
+      out.push(finish({ id: `ctr:${w.id}:${idx}`, ch: w.ch, topic: irr ? topic : 'verb-forms', diff: 1, type: 'mcq', prompt: `Choose the best translation of ${L(p.ind[idx])}.`, options: mcqOptions(correct, wrong, rng(hash('ctr' + w.id + idx))), answer: correct, explanation: whyVerbForm(w, idx) + (irr ? '' : ` Present tense also translates as “am/is/are ___ing”.`), rule: irr ? rule : 'c1.translate', vocab: [w.id] }));
     });
-    if (!sum) {
+    // ---- imperfect & future (Ch 5; sum and possum Ch 6)
+    const tch = Math.max(w.ch, irr ? 6 : 5), ttopic = irr ? 'sum-possum' : 'tenses', trule = (t) => (irr ? (w.irreg === 'possum' ? 'c6.possum' : 'c6.sum-tenses') : t === 'impf' ? 'c5.imperfect' : 'c5.future');
+    for (const t of ['impf', 'fut']) {
+      PERSONS.forEach((_, idx) => {
+        out.push(finish({ id: `cft:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 2, type: 'typed', lang: 'la', prompt: `Give the ${PERS_LABEL[idx]}, ${TENSE_NAME[t]} active indicative, of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [p[t][idx]], explanation: whyTense(w, t, idx), rule: trule(t), vocab: [w.id] }));
+      });
+      const ht = hash(`t:${w.id}:${t}`);
+      const idx = ht % 6;
+      const form = p[t][idx];
+      out.push(finish({ id: `tid:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 1, type: 'mcq', prompt: `Which tense is ${L(form)}? (from ${L(w.pp[0])})`, options: ['present', 'imperfect', 'future'], answer: TENSE_NAME[t], explanation: whyTense(w, t, idx), rule: trule(t), vocab: [w.id] }));
+      const correct = engVerb(w, t, idx);
+      if (correct) {
+        const wrong = [...['pres', 'impf', 'fut'].filter((x) => x !== t).map((x) => engVerb(w, x, idx)), ...[0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => engVerb(w, t, i))].filter(Boolean);
+        const opts = mcqOptions(correct, wrong, rng(hash(`ttr:${w.id}:${t}`)));
+        if (opts) out.push(finish({ id: `ttr:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 2, type: 'mcq', prompt: `Choose the best translation of ${L(form)}.`, options: opts, answer: correct, explanation: whyTense(w, t, idx) + (t === 'impf' ? ' The imperfect can also be translated “used to ___” or “kept ___ing”.' : ''), rule: trule(t), vocab: [w.id] }));
+      }
+    }
+    if (p.impSg) {
       const kinds = [['inf', p.inf, 'present infinitive', 'present active infinitive'], ['impSg', p.impSg, 'singular imperative', 'singular imperative (command to one person)'], ['impPl', p.impPl, 'plural imperative', 'plural imperative (command to several people)']];
       for (const [k, form, label] of kinds) {
         out.push(finish({ id: `ik:${w.id}:${k}`, ch: 1, topic: 'inf-imp', diff: 2, type: 'typed', lang: 'la', prompt: `Give the ${label} of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: `${L(form)}: ${k === 'inf' ? 'present stem + -re' : k === 'impSg' ? 'the bare present stem' : 'present stem + -te'}${w.irreg === 'do' ? '. (dō: dare, dā, date — the a is short except in dā.)' : '.'}`, rule: k === 'inf' ? 'c1.infinitive' : 'c1.imperative', vocab: [w.id] }));
@@ -190,13 +232,14 @@ function genNouns() {
     const head = `${L(w.la + ', ' + w.gen)} (${w.en[0]})`;
     for (const [c, n] of NCELLS) {
       if (c === 'voc' && !w.anim && !(w.type === 'um' || w.type === 'ium')) continue;
+      if (w.plOnly && n === 'sg') continue;
       out.push(finish({ id: `df:${w.id}:${c}.${n}`, ch: w.ch, topic: w.type === 'er' && c !== 'nom' && c !== 'voc' ? 'er-nouns' : set, diff: c === 'nom' || c === 'acc' ? 1 : c === 'voc' || w.type === 'er' || w.type === 'ius' ? 3 : 2, type: 'typed', lang: 'la', prompt: `Give the ${CASE_NAME[c]} ${NUM_NAME[n]} of ${head}.`, accept: nounForm(w, c, n), explanation: whyNounForm(w, c, n), rule, vocab: [w.id] }));
     }
     // identify: which case/number is possible?
     const h = hash('dcase:' + w.id);
     const cells = [['gen', 'sg'], ['dat', 'sg'], ['acc', 'sg'], ['abl', 'sg'], ['nom', 'pl'], ['gen', 'pl'], ['dat', 'pl'], ['acc', 'pl']];
     [h % 8, (h + 3) % 8].forEach((ci) => {
-      const [c, n] = cells[ci];
+      const [c, n] = w.plOnly ? cells[4 + (ci % 4)] : cells[ci];
       const form = nounForm(w, c, n)[0];
       const poss = new Set(analyzer.analyze(form).filter((a) => a.pos === 'noun').map((a) => `${a.case}.${a.number}`));
       const label = (cn) => { const [cc, nn] = cn.split('.'); return `${CASE_NAME[cc]} ${NUM_NAME[nn]}`; };
@@ -224,10 +267,10 @@ function genAgreement() {
     const h = hash('agree:' + w.id);
     const cells = NCELLS.filter(([c]) => c !== 'voc');
     [h % 10, (h + 5) % 10].forEach((ci, k) => {
-      const [c, n] = cells[ci];
+      const [c, n] = w.plOnly ? [cells[ci][0], 'pl'] : cells[ci];
       const allowed = adjs.filter((a) => !a.plOnly);
       const a = allowed[(h >>> (k * 3)) % allowed.length];
-      const g = w.gender;
+      const g = w.plNeut && n === 'pl' ? 'n' : w.gender;
       const need = Math.max(w.ch, a.ch, g === 'm' ? 3 : g === 'n' ? 4 : 2);
       const adjf = adjForm(a, g, c, n);
       const nf = nounForm(w, c, n)[0];

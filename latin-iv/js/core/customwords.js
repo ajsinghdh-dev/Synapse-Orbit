@@ -27,7 +27,7 @@ export function parseLine(line, defaultCh = 1, existing = new Map()) {
   const parts = f[0].split(',').map(clean).filter(Boolean);
   const en = f[1].split(/,|\//).map((s) => s.replace(/\([^)]*\)/g, '').trim()).filter(Boolean);
   let ch = defaultCh;
-  if (f[2]) { const n = parseInt(f[2], 10); if ([1, 2, 3, 4].includes(n)) ch = n; else if (f[2]) { errors.push(`Chapter must be 1–4 (got “${f[2]}”)`); } }
+  if (f[2]) { const n = parseInt(f[2], 10); if ([1, 2, 3, 4, 5, 6].includes(n)) ch = n; else if (f[2]) { errors.push(`Chapter must be 1–6 (got “${f[2]}”)`); } }
   const tag = (f[3] || '').toLowerCase();
   if (!en.length) errors.push('Give at least one English meaning');
   if (errors.length) return out();
@@ -61,7 +61,7 @@ export function parseLine(line, defaultCh = 1, existing = new Map()) {
       const s = strip(stem), n = strip(nom);
       if (n === s || n === s.slice(0, -1) + 'er' || (n.endsWith('er') && s.endsWith('r') && n.slice(0, -2) + 'r' === s)) type = 'er';
       else { errors.push(`${nom}, ${gen}: the nominative and genitive do not fit a Chapter 3 pattern (puer/puerī, ager/agrī, vir/virī)`); return out(); }
-    } else { errors.push(`${nom}, ${gen}: not a 1st-declension (-ae) or 2nd-declension (-ī) noun. Only these are covered in Chapters 1–4.`); return out(); }
+    } else { errors.push(`${nom}, ${gen}: not a 1st-declension (-ae) or 2nd-declension (-ī) noun. Only these are covered in Chapters 1–6.`); return out(); }
     const gender = genderTok;
     if ((type === 'um' || type === 'ium') && gender !== 'n') errors.push('Nouns in -um are neuter (n.)');
     if (type === 'a' && gender === 'n') errors.push('1st-declension nouns are not neuter');
@@ -78,17 +78,16 @@ export function parseLine(line, defaultCh = 1, existing = new Map()) {
     if (!base1) { errors.push('A verb entry starts with the 1st person singular, ending in -ō or -eō'); return out(); }
     let inf = parts[1];
     if (inf.startsWith('-')) inf = base1 + inf.slice(1);
-    if (/(ere|īre|ire)$/.test(inf) && !first.endsWith('eō') && !/ēre$/.test(inf)) { errors.push(`${first}, ${inf} looks like a 3rd or 4th conjugation verb. Only 1st (-āre) and 2nd (-ēre) conjugation verbs are covered in Chapters 1–4.`); return out(); }
+    if (/(ere|īre|ire)$/.test(inf) && !first.endsWith('eō') && !/ēre$/.test(inf)) { errors.push(`${first}, ${inf} looks like a 3rd or 4th conjugation verb. Only 1st (-āre) and 2nd (-ēre) conjugation verbs are covered in Chapters 1–6.`); return out(); }
     const conj = /ēre$/.test(inf) || (/ere$/.test(inf) && first.endsWith('eō')) ? 2 : 1;
     if (!/[āē]re$/.test(inf) && first !== 'dō') { const fixed = inf.replace(/are$/, 'āre').replace(/ere$/, 'ēre'); if (fixed !== inf) { warnings.push(`Added the macron: ${inf} → ${fixed}`); inf = fixed; } }
     if (strip(inf).slice(0, -3) + (conj === 1 ? 'o' : 'eo') !== strip(first)) { errors.push(`${first} and ${inf} do not belong together`); return out(); }
-    if (conj === 1 && !/(ā|a)re$/.test(inf) || conj === 2 && !/ēre$/.test(inf)) { errors.push(`${inf}: only 1st (-āre) and 2nd (-ēre) conjugation verbs are covered in Chapters 1–4`); return out(); }
+    if (conj === 1 && !/(ā|a)re$/.test(inf) || conj === 2 && !/ēre$/.test(inf)) { errors.push(`${inf}: only 1st (-āre) and 2nd (-ēre) conjugation verbs are covered in Chapters 1–6`); return out(); }
     let perf = parts[2] || null, ptc = parts[3] || null;
     if (perf && perf.startsWith('-')) perf = base1 + perf.slice(1);
     if (ptc && ptc.startsWith('-')) ptc = base1 + ptc.slice(1);
     if (!perf) warnings.push('No perfect given: perfect-tense questions are skipped for this verb');
-    lex = { id: mkId(first), la: first, pos: 'verb', conj, pp: [first, inf, perf, ptc], en: en.map((e) => e.replace(/^to /, '')), ch: 1, conf: 'core', note: '', irreg: first === 'dō' ? 'do' : undefined, custom: true };
-    if (ch !== 1) { warnings.push('Chapters 1–4 verbs of the 1st/2nd conjugation are taught in Chapter 1; chapter set to 1'); }
+    lex = { id: mkId(first), la: first, pos: 'verb', conj, pp: [first, inf, perf, ptc], en: en.map((e) => e.replace(/^to /, '')), ch, conf: 'core', note: '', irreg: first === 'dō' ? 'do' : undefined, custom: true };
   } else if (parts.length === 3 && /(us|er|ur)$/.test(parts[0]) && !genderTok) {
     // ---- adjective
     const m = parts[0]; let fem = parts[1], neu = parts[2];

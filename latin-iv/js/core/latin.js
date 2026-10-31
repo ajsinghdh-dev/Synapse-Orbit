@@ -1,4 +1,4 @@
-// LATIN IV — morphology engine for Wheelock's Latin Chapters 1–4.
+// LATIN IV — morphology engine for Wheelock's Latin Chapters 1–6.
 // Pure functions only (no DOM, no storage) so it can be unit-tested in Node.
 
 export const CASES = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
@@ -7,6 +7,8 @@ export const CASE_NAME = { nom: 'nominative', gen: 'genitive', dat: 'dative', ac
 export const NUM_NAME = { sg: 'singular', pl: 'plural' };
 export const GENDER_NAME = { m: 'masculine', f: 'feminine', n: 'neuter' };
 export const PERSON_NAME = { 1: '1st', 2: '2nd', 3: '3rd' };
+export const TENSES = ['pres', 'impf', 'fut'];
+export const TENSE_NAME = { pres: 'present', impf: 'imperfect', fut: 'future' };
 export const PERSONS = [[1, 'sg'], [2, 'sg'], [3, 'sg'], [1, 'pl'], [2, 'pl'], [3, 'pl']];
 
 /** Remove macrons (and any other combining marks); result is NFC. */
@@ -29,7 +31,7 @@ const ENDINGS = {
 /** Declension-type of a noun lexeme: 'a' | 'us' | 'ius' | 'er' | 'um' | 'ium'. */
 function nounShape(lex) {
   switch (lex.type) {
-    case 'a': return { end: ENDINGS.a, base: lex.la.slice(0, -1) };
+    case 'a': return { end: ENDINGS.a, base: lex.stem || lex.la.slice(0, -1) };
     case 'us': return { end: ENDINGS.us, base: lex.la.slice(0, -2) };
     case 'ius': return { end: ENDINGS.us, base: lex.la.slice(0, -2) };
     case 'er': return { end: ENDINGS.er, base: lex.stem };
@@ -62,7 +64,9 @@ function declineWith(lex, shape, nomForm) {
 }
 
 export function declineNoun(lex) {
-  return declineWith(lex, nounShape(lex), lex.la);
+  const d = declineWith(lex, nounShape(lex), lex.la);
+  if (lex.plNeut) { const base = lex.la.slice(0, -2); CASES.forEach((c, i) => { d.pl[c] = [base + ENDINGS.um.pl[i]]; }); }   // locus, -ī, m.; pl. loca, -ōrum, n.
+  return d;
 }
 /** Accepted forms for one cell of a noun paradigm. */
 export function nounForm(lex, c, n) {
@@ -97,28 +101,31 @@ export function adjForm(lex, g, c, n) { return declineAdj(lex)[g][n][c]; }
 export function adjFormsList(lex) { return [lex.la, lex.f, lex.n]; }
 
 // ----------------------------------------------------------------- verbs
-const SUM = { ind: ['sum', 'es', 'est', 'sumus', 'estis', 'sunt'], inf: 'esse' };
+const SUM = { ind: ['sum', 'es', 'est', 'sumus', 'estis', 'sunt'], impf: ['eram', 'erās', 'erat', 'erāmus', 'erātis', 'erant'], fut: ['erō', 'eris', 'erit', 'erimus', 'eritis', 'erunt'], inf: 'esse' };
+const POSSUM = { ind: ['possum', 'potes', 'potest', 'possumus', 'potestis', 'possunt'], impf: SUM.impf.map((f) => 'pot' + f), fut: SUM.fut.map((f) => 'pot' + f), inf: 'posse' };
+const IMPF = ['bam', 'bās', 'bat', 'bāmus', 'bātis', 'bant'];
+const FUT = ['bō', 'bis', 'bit', 'bimus', 'bitis', 'bunt'];
 
-/** Present active system of a 1st/2nd conjugation verb (and dō, sum). */
+/** Present, imperfect and future active of a 1st/2nd conjugation verb (and dō, sum, possum). `ind` is the present. */
 export function conjugate(lex) {
-  if (lex.irreg === 'sum') return { ind: SUM.ind, inf: SUM.inf, impSg: null, impPl: null, base: null, stem: null };
+  if (lex.irreg === 'sum') return { ...SUM, impSg: null, impPl: null, base: null, stem: null };
+  if (lex.irreg === 'possum') return { ...POSSUM, impSg: null, impPl: null, base: null, stem: null };
   const inf = lex.pp[1];
   const base = inf.slice(0, -3);
+  const tenses = (stem) => ({ impf: IMPF.map((e) => stem + e), fut: FUT.map((e) => stem + e) });
   if (lex.irreg === 'do') {
-    // dō, dare: the a is SHORT except in dās and dā
-    return { ind: ['dō', 'dās', 'dat', 'damus', 'datis', 'dant'], inf: 'dare', impSg: 'dā', impPl: 'date', base: 'd', stem: 'da' };
+    // dō, dare: the a is SHORT except in dās and dā (dabam, dabō keep the short a)
+    return { ind: ['dō', 'dās', 'dat', 'damus', 'datis', 'dant'], inf: 'dare', impSg: 'dā', impPl: 'date', base: 'd', stem: 'da', ...tenses('da') };
   }
-  if (lex.conj === 1) {
-    return { ind: [base + 'ō', base + 'ās', base + 'at', base + 'āmus', base + 'ātis', base + 'ant'], inf, impSg: base + 'ā', impPl: base + 'āte', base, stem: base + 'ā' };
-  }
-  if (lex.conj === 2) {
-    return { ind: [base + 'eō', base + 'ēs', base + 'et', base + 'ēmus', base + 'ētis', base + 'ent'], inf, impSg: base + 'ē', impPl: base + 'ēte', base, stem: base + 'ē' };
-  }
+  if (lex.conj === 1) return { ind: [base + 'ō', base + 'ās', base + 'at', base + 'āmus', base + 'ātis', base + 'ant'], inf, impSg: base + 'ā', impPl: base + 'āte', base, stem: base + 'ā', ...tenses(base + 'ā') };
+  if (lex.conj === 2) return { ind: [base + 'eō', base + 'ēs', base + 'et', base + 'ēmus', base + 'ētis', base + 'ent'], inf, impSg: base + 'ē', impPl: base + 'ēte', base, stem: base + 'ē', ...tenses(base + 'ē') };
   throw new Error('unsupported conjugation for ' + lex.la);
 }
+/** Forms of one tense: 'pres' | 'impf' | 'fut'. */
+export const tenseForms = (lex, t) => { const p = conjugate(lex); return t === 'pres' ? p.ind : p[t]; };
 export function verbEnding(lex, idx) {
   const p = conjugate(lex);
-  if (lex.irreg === 'sum') return '';
+  if (lex.irreg) return '';
   return p.ind[idx].slice(p.base.length);
 }
 /** Personal-ending (the "-ō/-m, -s, -t, -mus, -tis, -nt" set), for teaching. */
@@ -146,6 +153,8 @@ export function buildAnalyzer(lexicon) {
     if (lex.pos === 'verb') {
       const p = conjugate(lex);
       p.ind.forEach((f, i) => add(f, { ...base, mood: 'ind', tense: 'pres', voice: 'act', person: PERSONS[i][0], number: PERSONS[i][1] }));
+      const tch = Math.max(lex.ch, lex.irreg === 'sum' || lex.irreg === 'possum' ? 6 : 5);   // imperfect & future: Ch 5 (sum, possum: Ch 6)
+      for (const t of ['impf', 'fut']) p[t].forEach((f, i) => add(f, { ...base, ch: tch, mood: 'ind', tense: t, voice: 'act', person: PERSONS[i][0], number: PERSONS[i][1] }));
       add(p.inf, { ...base, mood: 'inf', tense: 'pres', voice: 'act' });
       if (p.impSg) {
         add(p.impSg, { ...base, mood: 'imp', tense: 'pres', voice: 'act', number: 'sg' });
@@ -153,9 +162,10 @@ export function buildAnalyzer(lexicon) {
       }
     } else if (lex.pos === 'noun') {
       const par = declineNoun(lex);
-      for (const n of NUMS) for (const c of CASES) {
+      for (const n of (lex.plOnly ? ['pl'] : NUMS)) for (const c of CASES) {
         const forms = new Set(nounForm(lex, c, n));
-        for (const f of forms) for (const g of genders(lex)) add(f, { ...base, case: c, number: n, gender: g, nounGender: lex.gender });
+        const gs = lex.plNeut && n === 'pl' ? ['n'] : genders(lex);
+        for (const f of forms) for (const g of gs) add(f, { ...base, case: c, number: n, gender: g, nounGender: lex.gender });
       }
       void par;
     } else if (lex.pos === 'adj') {
@@ -186,7 +196,7 @@ export function describe(a) {
   if (a.pos === 'noun') return `${CASE_NAME[a.case]} ${NUM_NAME[a.number]} (${GENDER_NAME[a.gender]})`;
   if (a.pos === 'adj') return `${CASE_NAME[a.case]} ${NUM_NAME[a.number]} ${GENDER_NAME[a.gender]}`;
   if (a.pos === 'verb') {
-    if (a.mood === 'ind') return `${PERSON_NAME[a.person]} person ${NUM_NAME[a.number]}, present active indicative`;
+    if (a.mood === 'ind') return `${PERSON_NAME[a.person]} person ${NUM_NAME[a.number]}, ${TENSE_NAME[a.tense || 'pres']} active indicative`;
     if (a.mood === 'imp') return `${NUM_NAME[a.number]} imperative, active`;
     return 'present active infinitive';
   }

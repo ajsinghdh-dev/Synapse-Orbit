@@ -1,7 +1,7 @@
 // Analytics from the attempt log. Pure functions of (state, now). Never invents data: with no
 // attempts every score is null.
 import { TOPICS } from '../data/curriculum.js';
-import { LEXICON } from '../data/lexicon.js';
+import { LEXICON, CH_LIST } from '../data/lexicon.js';
 import { DAY } from './srs.js';
 
 export const HALF_LIFE_DAYS = 4;       // recent performance counts more (the exam is days away)
@@ -40,7 +40,7 @@ export function readiness(state, now) {
   if (!keys.length) return { score: null, comps, confidence: 'none', n: at.length, chaptersAssessed: 0 };
   const tw = keys.reduce((s, k) => s + W[k], 0);
   const score = keys.reduce((s, k) => s + W[k] * comps[k].acc, 0) / tw;
-  const chaptersAssessed = [1, 2, 3, 4].filter((c) => at.filter((a) => a.ch === c).length >= 5).length;
+  const chaptersAssessed = CH_LIST.filter((c) => at.filter((a) => a.ch === c).length >= 5).length;
   const n = at.length;
   const confidence = n < 25 ? 'very low' : n < 80 || chaptersAssessed < 3 ? 'low' : n < 200 ? 'moderate' : 'good';
   return { score, comps, confidence, n, chaptersAssessed, missing: Object.keys(W).filter((k) => !comps[k]) };
@@ -136,13 +136,13 @@ export function mission(state, now, { activeIds, examTs }) {
   const yMistakes = op.filter((m) => m.last >= y0 && m.last < t0);
   const daysLeft = Math.ceil((examTs - now) / DAY);
   if (!state.attempts.length && !Object.keys(state.srs).length) {
-    return { primary: { id: 'diag', title: 'Take the 10-question diagnostic', why: 'You have no results yet. Ten mixed questions across all four chapters will tell us where to start. Nothing here is graded or saved as a score.', minutes: 6, href: '#/practice?ch=all&len=10&diff=2&start=1', label: 'Start diagnostic' }, alts: [{ title: 'Read the Chapter 1 lessons first', href: '#/study?ch=1', minutes: 10 }] };
+    return { primary: { id: 'diag', title: 'Take the 10-question diagnostic', why: 'You have no results yet. Ten mixed questions across all the chapters will tell us where to start. Nothing here is graded or saved as a score.', minutes: 6, href: '#/practice?ch=all&len=10&diff=2&start=1', label: 'Start diagnostic' }, alts: [{ title: 'Read the Chapter 1 lessons first', href: '#/study?ch=1', minutes: 10 }] };
   }
   if (dc.due >= 6) options.push({ id: 'srs', title: `Review ${Math.min(dc.due, 20)} due vocabulary ${dc.due === 1 ? 'word' : 'words'}`, why: `${dc.due} words are due. Reviewing them on schedule is the cheapest way to keep what you know.`, minutes: Math.ceil(Math.min(dc.due, 20) * 0.4), href: '#/vocabulary/practice?mode=srs&ch=all', label: 'Start review' });
   if (yMistakes.length >= 3) options.push({ id: 'ymist', title: `Re-attempt yesterday’s ${yMistakes.length} incorrect questions`, why: 'Errors you saw yesterday are the likeliest to return on the exam.', minutes: Math.ceil(yMistakes.length * 0.6), href: '#/mistakes?filter=yesterday&start=1', label: 'Re-attempt' });
   else if (op.length >= 4) options.push({ id: 'mist', title: `Re-attempt ${Math.min(op.length, 8)} open mistakes`, why: `${op.length} questions are still unresolved. Get each one right twice to close it.`, minutes: Math.ceil(Math.min(op.length, 8) * 0.6), href: '#/mistakes?start=1', label: 'Re-attempt' });
   if (wk[0] && wk[0].acc < 0.72) options.push({ id: 'weak', title: `Drill: ${wk[0].label}`, why: `Your accuracy on this is ${Math.round(wk[0].acc * 100)}% over ${wk[0].n} answers — your weakest area.`, minutes: 8, href: `#/practice?topic=${wk[0].topic}&len=10&diff=adaptive&start=1`, label: 'Practise' });
-  const planCh = PLAN_CH[dayKey] || [1, 2, 3, 4];
+  const planCh = PLAN_CH[dayKey] || CH_LIST;
   for (const c of planCh) {
     const n = state.attempts.filter((a) => a.ch === c).length;
     if (n < 10) { options.push({ id: 'cover' + c, title: `Work through Chapter ${c}`, why: `Only ${n} answers recorded for Chapter ${c}. It is on today’s plan.`, minutes: 10, href: `#/practice?ch=${c}&len=10&diff=2&start=1`, label: 'Start' }); break; }

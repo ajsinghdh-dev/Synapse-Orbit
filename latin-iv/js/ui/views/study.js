@@ -23,7 +23,7 @@ export default function study({ root, store, now, q: Q }) {
       const done = d.items.filter((_, k) => st.plan.done[d.date + '|' + k]).length;
       return `<div class="unit ${when}"><div><div class="k">Day ${i + 1} · ${esc(d.label)}${when === 'today' ? ' · today' : ''}</div><h3>${esc(d.theme)}</h3></div><span class="k">${done}/${d.items.length}</span></div>
       <div class="nodes">${d.items.map((it, k) => { const isDone = !!st.plan.done[d.date + '|' + k]; const isNext = i === todayIdx && k === nextK; return `<div class="node ${isDone ? 'done' : when !== 'past' ? 'open' : ''} ${isNext ? 'next' : ''}" style="--dx:${DX[k % DX.length]}">${isNext ? '<span class="bubble">Start</span>' : ''}<a class="disc" href="${it.href}" aria-label="${esc(it.t)}">${icon(isDone ? 'check' : ico(it.href))}</a><span class="lbl">${esc(it.t)}${it.m ? ` · ${it.m} min` : ''}</span><label class="small muted" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" data-d="${d.date}|${k}" ${isDone ? 'checked' : ''}> done</label></div>`; }).join('')}</div>`;
-    }).join('')}</div><p class="small muted mt2">Tap a circle to open that activity, then tick it off. New material is on Days 1–4; Days 5–6 are for full mocks and repair.</p>`;
+    }).join('')}</div><p class="small muted mt2">Tap a circle to open that activity, then tick it off. This plan was built for the Chapters 1–4 exam; Chapters 5 and 6 have their own lessons in the tabs above.</p>`;
     body.addEventListener('change', (e) => { const c = e.target.closest('[data-d]'); if (c) { if (c.checked) st.plan.done[c.dataset.d] = true; else delete st.plan.done[c.dataset.d]; store.save(true); study({ root, store, now, q: Q }); } });
   } else {
     const c = CHAPTERS[ch - 1];

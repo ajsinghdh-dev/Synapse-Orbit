@@ -1,10 +1,11 @@
 // Paradigm tables used by Study, Reference and the labs.
 import { BY_ID } from '../data/lexicon.js';
-import { conjugate, declineNoun, declineAdj, CASES, CASE_NAME, NUMS, PERSONS } from '../core/latin.js';
+import { conjugate, declineNoun, declineAdj, CASES, CASE_NAME, NUMS, PERSONS, TENSE_NAME } from '../core/latin.js';
 import { esc } from './util.js';
 
 const CN = { nom: 'Nominative', gen: 'Genitive', dat: 'Dative', acc: 'Accusative', abl: 'Ablative', voc: 'Vocative' };
 const PL = ['1st', '2nd', '3rd'];
+void 0;
 
 function split(form, stemLen) { return `<span class="st">${esc(form.slice(0, stemLen))}</span><span class="end">${esc(form.slice(stemLen))}</span>`; }
 
@@ -36,7 +37,18 @@ export function casesTable() {
   return `<div class="tscroll"><table class="ptable"><thead><tr><th>Case</th><th>Main functions</th><th>Example</th></tr></thead><tbody>${rows.map((r) => `<tr><th>${r[0]}</th><td>${esc(r[1])}</td><td class="la">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
+/** One tense of several verbs, with the tense sign highlighted. */
+export function tenseTable(ids, t) {
+  const vs = ids.map((i) => BY_ID[i]); const ps = vs.map(conjugate);
+  const hl = (f, v, p) => (v.irreg ? esc(f) : `<span class="st">${esc(f.slice(0, p.stem.length))}</span><span class="end">${esc(f.slice(p.stem.length))}</span>`);
+  return `<div class="tscroll"><table class="ptable"><thead><tr><th>${TENSE_NAME[t] || 'present'}</th>${vs.map((v) => `<th colspan="2"><span class="la">${esc(v.pp[0])}, ${esc(v.pp[1])}</span></th>`).join('')}</tr><tr><th></th>${vs.map(() => '<th>Singular</th><th>Plural</th>').join('')}</tr></thead><tbody>${[0, 1, 2].map((r) => `<tr><th>${PL[r]} person</th>${vs.map((v, i) => [r, r + 3].map((idx) => `<td class="la">${hl(ps[i][t][idx], v, ps[i])}</td>`).join('')).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
 export const TABLES = {
+  'tense-fut': () => tenseTable(['amo', 'moneo'], 'fut'),
+  'tense-impf': () => tenseTable(['amo', 'moneo'], 'impf'),
+  'adj-er': () => adjTable('liber') + '<div class="mt2"></div>' + adjTable('noster'),
+  'sum-all': () => ['pres', 'impf', 'fut'].map((t) => tenseTable(['sum'], t === 'pres' ? 'ind' : t)).join('<div class="mt1"></div>'),
+  'possum-all': () => ['pres', 'impf', 'fut'].map((t) => tenseTable(['possum'], t === 'pres' ? 'ind' : t)).join('<div class="mt1"></div>'),
   'verbs-ind': () => verbTable(['amo', 'moneo']),
   'verbs-forms': () => verbFormsTable(['amo', 'laudo', 'moneo', 'video']),
   'decl-1': () => declTable(['puella', 'nauta']),

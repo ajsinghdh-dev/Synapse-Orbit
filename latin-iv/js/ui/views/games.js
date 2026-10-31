@@ -4,6 +4,7 @@ import { newGame, resolve, enemyHp, enemyName, timeLimit, MAX_LIVES } from '../.
 import { TOPICS } from '../../data/curriculum.js';
 import { esc, fmt, optHtml, icon, $, $$, toast } from '../util.js';
 import { mascot } from '../mascot.js';
+import { CH_LIST } from '../../data/lexicon.js';
 
 let audio = null;
 const tone = (f, d = 0.12, type = 'triangle', v = 0.05) => { try { audio ||= new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain(); o.type = type; o.frequency.value = f; g.gain.value = v; o.connect(g); g.connect(audio.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d); o.stop(audio.currentTime + d); } catch { /* sound is optional */ } };
@@ -19,7 +20,7 @@ export default function games({ root, store, now, q: Q }) {
     clearInterval(timer);
     root.innerHTML = `<div class="page-head"><div><div class="inscr">Lūdī</div><h1 class="mt1">Legion Rush</h1><p>Hold the line. Every correct Latin answer is a strike; every miss costs a life. Fast answers hit twice. It uses your real question bank, so it counts as practice.</p></div></div>
     <div class="grid g2" style="align-items:start"><section class="card col"><h3>How to play</h3><ul class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px"><li>Answer before the bar runs out. Answer in the first 40% of the time for a <strong>critical hit</strong> (double damage).</li><li>Every <strong>5 correct in a row</strong> earns a <span class="badge gold">Freeze</span> that stops the clock for one question. Defeating an enemy earns a <span class="badge gold">50/50</span>.</li><li>Every third enemy restores a life (up to ${MAX_LIVES}). Each wave is harder and faster.</li><li>Keys <span class="kbd">1</span>–<span class="kbd">4</span> answer, <span class="kbd">F</span> freezes, <span class="kbd">H</span> uses 50/50.</li></ul></section>
-    <section class="card col"><h3>Choose your battlefield</h3><div class="chips" id="ch">${[['all', 'All chapters'], [1, 'Chapter 1'], [2, 'Chapter 2'], [3, 'Chapter 3'], [4, 'Chapter 4']].map(([v, l]) => `<button class="chip" data-v="${v}" aria-pressed="${String(Q.ch || 'all') === String(v)}">${l}</button>`).join('')}</div>
+    <section class="card col"><h3>Choose your battlefield</h3><div class="chips" id="ch">${[['all', 'All chapters'], ...CH_LIST.map((n) => [n, 'Chapter ' + n])].map(([v, l]) => `<button class="chip" data-v="${v}" aria-pressed="${String(Q.ch || 'all') === String(v)}">${l}</button>`).join('')}</div>
       <label class="switch"><input type="checkbox" id="snd" ${Q.mute ? '' : 'checked'}> Sound effects</label>
       <div class="row"><button class="btn primary lg" id="go">${icon('play')}Begin</button></div>
       <div class="small muted">High score <strong>${st.game.best}</strong>${st.game.plays.length ? ' · last: ' + st.game.plays.slice(-3).reverse().map((p) => p.score + ' (wave ' + p.wave + ')').join(', ') : ''}</div></section></div>`;

@@ -4,6 +4,7 @@ import { TOPICS } from '../../data/curriculum.js';
 import { ERR_LABEL } from '../../core/analytics.js';
 import { mountQuestion, ruleBox } from '../qrun.js';
 import { esc, icon, pct, $, fmt } from '../util.js';
+import { CH_LIST } from '../../data/lexicon.js';
 import { say, confetti } from '../mascot.js';
 
 const CHOICES = { section: [['everything', 'Everything'], ['vocabulary', 'Vocabulary'], ['grammar', 'Grammar'], ['translation', 'Translation'], ['conjugation', 'Conjugation'], ['declension', 'Declension']], diff: [['1', 'Foundation'], ['2', 'Standard'], ['3', 'Challenging'], ['adaptive', 'Adaptive']], len: [5, 10, 20, 40] };
@@ -82,7 +83,7 @@ export default function practice({ root, store, now, q: Q, parts }) {
     root.innerHTML = `<div class="page-head"><div><h1>Practice Tests</h1><p>Choose what to practise. Adaptive mode steers toward what you keep missing and stops repeating what you have mastered.</p></div><a class="btn" href="#/games">${icon('bolt')}Play Legion Rush</a></div>
     ${st.inprogress.practice ? `<div class="card soft mb0" style="margin-bottom:var(--s4)"><div class="row between"><span>You have an unfinished session.</span><a class="btn" href="#/practice/run">Resume</a></div></div>` : ''}
     <div class="card col" style="gap:var(--s5)">
-      <div><div class="lbl">Chapters</div><div class="chips mt1" data-k="ch">${[['all', 'All mixed'], [1, 'Chapter 1'], [2, 'Chapter 2'], [3, 'Chapter 3'], [4, 'Chapter 4']].map(([v, l]) => `<button class="chip" data-v="${v}" aria-pressed="${v === 'all' ? cfg.chapters === 'all' : cfg.chapters !== 'all' && cfg.chapters.includes(v)}">${l}</button>`).join('')}</div></div>
+      <div><div class="lbl">Chapters</div><div class="chips mt1" data-k="ch">${[['all', 'All mixed'], ...CH_LIST.map((n) => [n, 'Chapter ' + n])].map(([v, l]) => `<button class="chip" data-v="${v}" aria-pressed="${v === 'all' ? cfg.chapters === 'all' : cfg.chapters !== 'all' && cfg.chapters.includes(v)}">${l}</button>`).join('')}</div></div>
       <div><div class="lbl">Question type</div><div class="mt1">${seg('section', CHOICES.section, cfg.section)}</div></div>
       <div><div class="lbl">Difficulty</div><div class="mt1">${seg('diff', CHOICES.diff, cfg.diff)}</div></div>
       <div><div class="lbl">Length</div><div class="chips mt1" data-k="len">${CHOICES.len.map((n) => `<button class="chip" data-v="${n}" aria-pressed="${cfg.len === n}">${n} questions</button>`).join('')}<label class="chip" style="padding:0 6px 0 12px">Custom <input id="custom" class="input" type="number" min="1" max="100" style="width:70px;min-height:28px;padding:2px 8px;margin-left:6px" value="${CHOICES.len.includes(cfg.len) ? '' : cfg.len}"></label></div></div>

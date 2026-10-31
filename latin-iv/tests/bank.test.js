@@ -77,7 +77,9 @@ test('no question draws on a later chapter than it is labelled with', () => {
       for (const t of tokensOf(q.answer)) assert.ok(analyzer.analyze(t.toLowerCase()).length, `${q.id}: correct answer token “${t}” unknown`);
     }
   }
-  for (const q of BANK.filter((x) => x.topic === 'decl2n' || x.topic === 'sum')) assert.equal(q.ch, 4, q.id);
+  for (const q of BANK.filter((x) => x.topic === 'decl2n' || x.topic === 'sum')) assert.ok(q.ch >= 4, q.id);
+  for (const q of BANK.filter((x) => x.topic === 'tenses' || x.topic === 'er-adj')) assert.ok(q.ch >= 5, q.id);
+  for (const q of BANK.filter((x) => x.topic === 'sum-possum' || x.topic === 'compl-inf')) assert.ok(q.ch >= 6, q.id);
   for (const q of BANK.filter((x) => x.topic === 'decl2m' || x.topic === 'er-nouns')) assert.ok(q.ch >= 3, q.id);
 });
 

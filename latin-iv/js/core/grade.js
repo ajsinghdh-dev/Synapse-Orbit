@@ -1,5 +1,5 @@
 // Answer grading. Pure functions.
-import { strip, canon, CASE_NAME, NUM_NAME, GENDER_NAME, describe } from './latin.js';
+import { strip, canon, CASE_NAME, NUM_NAME, GENDER_NAME, TENSE_NAME, describe } from './latin.js';
 import { analyzer } from './corpus.js';
 import { BY_ID } from '../data/lexicon.js';
 import { checkKeywords } from './sentences.js';
@@ -65,7 +65,7 @@ export function parseSlot(spec) {
   const slot = { spec, lemma };
   if (!rest) return slot;
   const bits = rest.split('.');
-  if (/^[123]$/.test(bits[0])) { slot.mood = 'ind'; slot.person = +bits[0]; slot.number = bits[1]; }
+  if (/^[123]$/.test(bits[0])) { slot.mood = 'ind'; slot.person = +bits[0]; slot.number = bits[1]; slot.tense = bits[2] || 'pres'; }
   else if (bits[0] === 'imp') { slot.mood = 'imp'; slot.number = bits[1]; }
   else if (bits[0] === 'inf') { slot.mood = 'inf'; }
   else { slot.case = bits[0]; slot.number = bits[1]; if (bits[2]) slot.gender = bits[2]; }
@@ -73,13 +73,13 @@ export function parseSlot(spec) {
 }
 function slotMatches(slot, a) {
   if (a.lemma !== slot.lemma) return false;
-  for (const k of ['case', 'number', 'gender', 'person', 'mood']) if (slot[k] != null && a[k] !== slot[k]) return false;
+  for (const k of ['case', 'number', 'gender', 'person', 'mood', 'tense']) if (slot[k] != null && a[k] !== slot[k]) return false;
   return true;
 }
 export function describeSlot(slot) {
   const lex = BY_ID[slot.lemma];
   const bits = [];
-  if (slot.mood === 'ind') bits.push(`${['', '1st', '2nd', '3rd'][slot.person]} person ${NUM_NAME[slot.number]}`);
+  if (slot.mood === 'ind') bits.push(`${['', '1st', '2nd', '3rd'][slot.person]} person ${NUM_NAME[slot.number]}${slot.tense && slot.tense !== 'pres' ? ', ' + TENSE_NAME[slot.tense] : ''}`);
   else if (slot.mood === 'imp') bits.push(`${NUM_NAME[slot.number]} imperative`);
   else if (slot.mood === 'inf') bits.push('infinitive');
   else if (slot.case) bits.push(`${CASE_NAME[slot.case]} ${NUM_NAME[slot.number]}${slot.gender ? ' ' + GENDER_NAME[slot.gender] : ''}`);
@@ -139,7 +139,7 @@ export function gradeCompose(input, slotSpecs, { strict = false } = {}) {
   });
   const extras = toks.filter((_, ti) => !best.map.includes(ti)).filter((tk) => !detail.some((d) => d.token === tk.w && !d.ok && d.wrongForm));
   for (const e of extras) {
-    if (!e.cands.length) messages.push(`“${e.w}” is not a Latin form in the Chapters 1–4 vocabulary — check the spelling.`);
+    if (!e.cands.length) messages.push(`“${e.w}” is not a Latin form in the Chapters 1–6 vocabulary — check the spelling.`);
     else messages.push(`Extra word: “${e.w}” is not needed for this sentence.`);
   }
   const okCount = detail.filter((d) => d.ok).length;

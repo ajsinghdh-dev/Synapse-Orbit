@@ -350,3 +350,4 @@ a { color: var(--blue-edge); font-weight: 700; } :root[data-theme="dark"] a { co
 .qcard { border-radius: 20px; } .qprompt { font-weight: 800; font-size: 20px; }
 .btn.primary:hover { filter: brightness(1.05); }
 ::selection { background: #CDEEFF; }
+.c5 { background: var(--red); } .c6 { background: #2BB5A8; }

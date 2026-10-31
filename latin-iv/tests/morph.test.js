@@ -31,17 +31,17 @@ test('lexicon entries are well-formed', () => {
   const ids = new Set();
   for (const w of LEXICON) {
     assert.ok(!ids.has(w.id), 'duplicate id ' + w.id); ids.add(w.id);
-    assert.ok(w.la && w.en?.length && [1, 2, 3, 4].includes(w.ch), w.id);
+    assert.ok(w.la && w.en?.length && [1, 2, 3, 4, 5, 6].includes(w.ch), w.id);
     assert.ok(['core', 'check'].includes(w.conf), w.id + ' conf');
     if (w.pos === 'verb') {
       assert.equal(w.pp[0], w.la);
-      if (w.irreg !== 'sum') {
+      if (w.irreg !== 'sum' && w.irreg !== 'possum') {
         assert.ok(w.pp[1].endsWith(w.irreg === 'do' ? 'are' : w.conj === 1 ? 'āre' : 'ēre'), w.id + ' infinitive vs conjugation');
         if (w.irreg !== 'do') assert.equal(strip(w.pp[1]).slice(0, -3) + (w.conj === 1 ? 'o' : 'eo'), strip(w.la), w.id + ' stem vs 1st pp');
       }
     }
     if (w.pos === 'noun') {
-      assert.ok(declineNoun(w).sg.gen.includes(w.gen), `${w.id}: stored genitive ${w.gen} must be produced by the engine`);
+      assert.ok(declineNoun(w)[w.plOnly ? 'pl' : 'sg'].gen.includes(w.gen), `${w.id}: stored genitive ${w.gen} must be produced by the engine`);
       assert.ok(['m', 'f', 'n', 'mf'].includes(w.gender));
       if (w.type === 'um' || w.type === 'ium') assert.equal(w.gender, 'n');
       if (w.type === 'a') assert.ok(w.gender !== 'n');
@@ -53,7 +53,7 @@ test('chapter assignment respects when each declension is taught', () => {
   for (const w of LEXICON) {
     if (w.pos === 'noun' && w.type === 'a') assert.ok(w.ch >= 2, w.id);
     if (w.pos === 'noun' && ['us', 'ius', 'er'].includes(w.type)) assert.ok(w.ch >= 3, w.id);
-    if (w.pos === 'noun' && ['um', 'ium'].includes(w.type)) assert.equal(w.ch, 4, w.id);
+    if (w.pos === 'noun' && ['um', 'ium'].includes(w.type)) assert.ok(w.ch >= 4, w.id);
   }
 });
 
@@ -78,4 +78,24 @@ test('analyzer recognises syncretism honestly', () => {
   assert.ok(cn('bella').has('nom.pl') && cn('bella').has('acc.pl'));
   assert.ok(!cn('bella').has('abl.sg'));
   assert.ok(an.analyzeLoose('puella').length > an.analyze('puella').length, 'macronless puella is ambiguous');
+});
+
+test('Chapter 5–6 forms match hand-typed tables', async () => {
+  const { tenseForms } = await import('../js/core/latin.js');
+  const T = {
+    amo: { impf: 'amābam amābās amābat amābāmus amābātis amābant', fut: 'amābō amābis amābit amābimus amābitis amābunt' },
+    moneo: { impf: 'monēbam monēbās monēbat monēbāmus monēbātis monēbant', fut: 'monēbō monēbis monēbit monēbimus monēbitis monēbunt' },
+    do: { impf: 'dabam dabās dabat dabāmus dabātis dabant', fut: 'dabō dabis dabit dabimus dabitis dabunt' },
+    sum: { pres: 'sum es est sumus estis sunt', impf: 'eram erās erat erāmus erātis erant', fut: 'erō eris erit erimus eritis erunt' },
+    possum: { pres: 'possum potes potest possumus potestis possunt', impf: 'poteram poterās poterat poterāmus poterātis poterant', fut: 'poterō poteris poterit poterimus poteritis poterunt' },
+  };
+  for (const [id, ts] of Object.entries(T)) for (const [t, s] of Object.entries(ts)) assert.deepEqual(tenseForms(BY_ID[id], t), s.split(' '), `${id} ${t}`);
+  const a = (id) => declineAdj(BY_ID[id]);
+  assert.deepEqual([a('liber_adj').m.sg.nom[0], a('liber_adj').f.sg.nom[0], a('liber_adj').m.sg.gen[0]], ['līber', 'lībera', 'līberī']);
+  assert.deepEqual([a('noster').f.sg.nom[0], a('noster').m.pl.acc[0], a('vester').n.pl.nom[0]], ['nostra', 'nostrōs', 'vestra']);
+  assert.deepEqual([a('pulcher').f.sg.abl[0], a('pulcher').m.sg.voc[0]], ['pulchrā', 'pulcher']);
+  assert.deepEqual(['nom', 'gen', 'acc'].map((c) => declineNoun(BY_ID.locus).pl[c][0]), ['loca', 'locōrum', 'loca']);
+  assert.deepEqual(['nom', 'gen', 'acc', 'abl'].map((c) => declineNoun(BY_ID.insidiae).pl[c][0]), ['īnsidiae', 'īnsidiārum', 'īnsidiās', 'īnsidiīs']);
+  assert.equal(declineNoun(BY_ID.liber).sg.gen[0], 'librī');
+  assert.deepEqual(BY_ID.possum.pp, ['possum', 'posse', 'potuī', null]);
 });

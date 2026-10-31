@@ -7,7 +7,7 @@ export const SECTIONS = {
 
 // topic → label, chapters it belongs to, mock-exam section
 export const TOPICS = {
-  vocab: { label: 'Vocabulary', section: 'vocabulary', ch: [1, 2, 3, 4] },
+  vocab: { label: 'Vocabulary', section: 'vocabulary', ch: [1, 2, 3, 4, 5, 6] },
   'verb-forms': { label: 'Present active forms', section: 'conjugation', ch: [1] },
   'verb-id': { label: 'Identifying verb forms', section: 'conjugation', ch: [1] },
   'inf-imp': { label: 'Infinitives & imperatives', section: 'conjugation', ch: [1] },
@@ -16,7 +16,7 @@ export const TOPICS = {
   'case-func': { label: 'Cases & their functions', section: 'grammar', ch: [2, 3] },
   gender: { label: 'Noun gender', section: 'grammar', ch: [2] },
   prep: { label: 'Prepositions', section: 'grammar', ch: [2, 3] },
-  'adj-agree': { label: 'Adjective agreement', section: 'grammar', ch: [2, 3, 4] },
+  'adj-agree': { label: 'Adjective agreement', section: 'grammar', ch: [2, 3, 4, 5, 6] },
   decl2m: { label: 'Second-declension masculine', section: 'declension', ch: [3] },
   'er-nouns': { label: '-er nouns & stems', section: 'declension', ch: [3] },
   apposition: { label: 'Apposition', section: 'grammar', ch: [3] },
@@ -24,10 +24,14 @@ export const TOPICS = {
   sum: { label: 'The verb sum', section: 'conjugation', ch: [4] },
   'pred-nom': { label: 'Predicate nominative', section: 'grammar', ch: [4] },
   substantive: { label: 'Substantive adjectives', section: 'grammar', ch: [4] },
-  syntax: { label: 'Sentence structure', section: 'grammar', ch: [2, 3, 4] },
-  ec: { label: 'Error correction', section: 'grammar', ch: [1, 2, 3, 4] },
-  'translate-la': { label: 'Latin → English', section: 'translation', ch: [1, 2, 3, 4] },
-  'translate-en': { label: 'English → Latin', section: 'translation', ch: [1, 2, 3, 4] },
+  syntax: { label: 'Sentence structure', section: 'grammar', ch: [2, 3, 4, 5, 6] },
+  ec: { label: 'Error correction', section: 'grammar', ch: [1, 2, 3, 4, 5, 6] },
+  'translate-la': { label: 'Latin → English', section: 'translation', ch: [1, 2, 3, 4, 5, 6] },
+  'translate-en': { label: 'English → Latin', section: 'translation', ch: [1, 2, 3, 4, 5, 6] },
+  tenses: { label: 'Future & imperfect', section: 'conjugation', ch: [5] },
+  'er-adj': { label: 'Adjectives in -er', section: 'declension', ch: [5] },
+  'sum-possum': { label: 'Sum & possum (all tenses)', section: 'conjugation', ch: [6] },
+  'compl-inf': { label: 'Complementary infinitive', section: 'grammar', ch: [6] },
 };
 
 export const RULES = {
@@ -40,7 +44,7 @@ export const RULES = {
   'c2.decl1': { ch: 2, title: 'First declension', text: 'Genitive singular in {-ae}. Endings — sg.: {-a, -ae, -ae, -am, -ā} · pl.: {-ae, -ārum, -īs, -ās, -īs} (nom., gen., dat., acc., abl.); the vocative is the same as the nominative. **Stem = genitive singular minus {-ae}**: {puella, puellae → puell-}. Watch the macron: {puella} (nom.) vs {puellā} (abl.).' },
   'c2.cases': { ch: 2, title: 'Cases and their functions', text: '**Nominative**: subject (and predicate nominative). **Genitive**: possession, “of”. **Dative**: indirect object, “to/for”. **Accusative**: direct object, and the object of {in} meaning “into”. **Ablative**: “by, with, from, in”, often with prepositions ({sine}, {dē}, {in}). **Vocative**: direct address. A *case* is a form; a *function* is the job the word does in the sentence.' },
   'c2.gender': { ch: 2, title: 'Gender is not the same as declension', text: 'Gender belongs to each noun. Most 1st-declension nouns are feminine, but {nauta}, {poēta} and (Chapter 3) {agricola} are **masculine** because they name men. A 1st-declension noun is therefore **not necessarily feminine**: adjectives follow the *gender*, not the {-a} ending — {nauta Rōmānus}, {puella mea}.' },
-  'c2.prep': { ch: 2, title: 'Prepositions in Chapters 1–4', text: 'Prepositions take the accusative or ablative, never the nominative. Chapter 2: {sine} + ablative “without” ({sine pecūniā}). Chapter 3: {dē} + ablative “down from, from; concerning, about” ({dē fīliā}); {in} + ablative “in, on” (place where: {in agrō}) and {in} + accusative “into, toward, against” (motion: {in agrum}).' },
+  'c2.prep': { ch: 2, title: 'Prepositions in Chapters 1–6', text: 'Prepositions take the accusative or ablative, never the nominative. Chapter 5 adds {propter} + accusative “on account of, because of”. Chapter 2: {sine} + ablative “without” ({sine pecūniā}). Chapter 3: {dē} + ablative “down from, from; concerning, about” ({dē fīliā}); {in} + ablative “in, on” (place where: {in agrō}) and {in} + accusative “into, toward, against” (motion: {in agrum}).' },
   'c2.adj': { ch: 2, title: 'Adjective agreement', text: 'An adjective agrees with its noun in **gender, number and case** — not necessarily in its ending letters. Adjectives like {magnus, magna, magnum} use 1st-declension endings for the feminine (Chapter 2: {puella mea}, {multae rosae}) and 2nd-declension endings for masculine (Chapter 3) and neuter (Chapter 4).' },
   'c3.decl2m': { ch: 3, title: 'Second declension masculine', text: 'Genitive singular in {-ī}. Endings — sg.: {-us, -ī, -ō, -um, -ō, -e} · pl.: {-ī, -ōrum, -īs, -ōs, -īs, -ī}. Stem = genitive singular minus {-ī}. Nouns in {-ius} such as {fīlius} have vocative {fīlī}; the genitive is {fīliī} (sometimes contracted to {fīlī}).' },
   'c3.er': { ch: 3, title: 'Nouns in -er', text: 'The nominative (and vocative) singular has no ending. Some keep the {-e-} through the paradigm ({puer, puerī}, stem puer-; {vir, virī}); others **drop it**: {ager, agrī} (stem agr-), and in Chapter 4 {magister, magistrī}. **Always read the stem from the genitive.**' },
@@ -52,6 +56,12 @@ export const RULES = {
   'c4.substantive': { ch: 4, title: 'Substantive adjectives', text: 'An adjective can stand alone as a noun: masculine plural {bonī} “good men”, feminine {bonae} “good women”, neuter plural {bona} “good things”. The gender and number of the form tell you what is meant.' },
   'c4.adj': { ch: 4, title: 'First/second-declension adjectives', text: '{bonus, bona, bonum}: masculine like {amīcus}, feminine like {puella}, neuter like {bellum}. Watch for look-alikes: {bellus, -a, -um} “pretty” vs {bellum, -ī, n.} “war”; {paucī, -ae, -a} “few” is plural only; {meus} has masculine vocative {mī}.' },
   'c4.sentence': { ch: 4, title: 'A method for translating', text: '1) Find the **verb** (person/number). 2) Find the **subject** (nominative that matches). 3) Identify other cases (acc. object, dat. indirect object, gen. “of”, abl. with prepositions). 4) Match each adjective to its noun by gender, number, case. 5) Translate the sentence, not word by word.' },
+  'c5.future': { ch: 5, title: 'Future active indicative (1st & 2nd conjugation)', text: 'Present stem + {-bō, -bis, -bit, -bimus, -bitis, -bunt}: {amābō} “I shall/will love”, {monēbis} “you will warn”, {dabunt} “they will give”. Look for the **b** plus the vowels ō / i / u: **bō, bi-, bu-**. The stem vowel stays long ({amā-}, {monē-}); {dō} keeps its short a ({dabō}).' },
+  'c5.imperfect': { ch: 5, title: 'Imperfect active indicative', text: 'Present stem + {-bam, -bās, -bat, -bāmus, -bātis, -bant}: {amābam} “I was loving, I used to love, I kept loving”, {monēbat} “he was warning”. The sign is **-bā-**. The imperfect describes continuing, repeated or habitual action in the past. Compare future {-bi-} with imperfect {-bā-}: {laudābit} (will praise) vs {laudābat} (was praising).' },
+  'c5.er-adj': { ch: 5, title: 'Adjectives in -er', text: 'Some 1st/2nd-declension adjectives end in {-er} in the masculine nominative. Some keep the {-e-}: {līber, lībera, līberum} (free). Most drop it: {noster, nostra, nostrum}; {vester, vestra, vestrum}; {pulcher, pulchra, pulchrum}. **The feminine form shows the stem**, just as the genitive does for nouns ({ager, agrī}).' },
+  'c6.sum-tenses': { ch: 6, title: 'Sum: future and imperfect', text: 'Future: {erō, eris, erit, erimus, eritis, erunt} “I shall be…”. Imperfect: {eram, erās, erat, erāmus, erātis, erant} “I was…”. These are irregular and must be memorized; note the endings {-ō/-m, -s, -t, -mus, -tis, -nt} are still the familiar personal endings.' },
+  'c6.possum': { ch: 6, title: 'Possum (be able, can)', text: '{possum} = {pot-} + {sum}: {pot-} before a vowel, {pos-} before s. Present {possum, potes, potest, possumus, potestis, possunt}; imperfect {poteram, poterās…}; future {poterō, poteris…}; infinitive {posse}; principal parts {possum, posse, potuī, —}. Translate “can, could, be able”.' },
+  'c6.compl-inf': { ch: 6, title: 'Complementary infinitive', text: 'Verbs like {possum}, {dēbeō} and other verbs of ability or obligation are completed by an infinitive with the **same subject**: {tolerāre nōn possumus} “we cannot endure”; {manēre dēbēs} “you ought to stay”. The infinitive has no person of its own; the main verb carries the subject.' },
   'vocab': { ch: 1, title: 'Learning vocabulary', text: 'Learn the full dictionary entry: for verbs the principal parts; for nouns the nominative, genitive and gender; for adjectives all three nominatives. The genitive is what tells you a noun’s declension and stem.' },
 };
 
@@ -85,6 +95,16 @@ export const LESSONS = {
     { rule: 'c4.substantive' },
     { rule: 'c4.adj', table: 'adj-all' },
     { rule: 'c4.sentence' },
+  ],
+  5: [
+    { rule: 'c5.future', table: 'tense-fut' },
+    { rule: 'c5.imperfect', table: 'tense-impf' },
+    { rule: 'c5.er-adj', table: 'adj-er' },
+  ],
+  6: [
+    { rule: 'c6.sum-tenses', table: 'sum-all' },
+    { rule: 'c6.possum', table: 'possum-all' },
+    { rule: 'c6.compl-inf' },
   ],
 };
 
@@ -138,7 +158,9 @@ export const SOURCES = {
     { label: 'Chapter 2 — unit 02', url: 'https://hcmc.uvic.ca/project/latin/wheelock/unit02/index.htm' },
     { label: 'Chapter 3 — unit 03', url: 'https://hcmc.uvic.ca/project/latin/wheelock/unit03/index.htm' },
     { label: 'Chapter 4 — unit 04', url: 'https://hcmc.uvic.ca/project/latin/wheelock/unit04/index.htm' },
+    { label: 'Chapter 5 — unit 05', url: 'https://hcmc.uvic.ca/project/latin/wheelock/unit05/index.htm' },
+    { label: 'Chapter 6 — unit 06', url: 'https://hcmc.uvic.ca/project/latin/wheelock/unit06/index.htm' },
   ],
   attribution: 'Wheelock’s Latin (7th ed., revised by Richard A. LaFleur) is the course text; the University of Victoria Humanities Computing and Media Centre hosts the exercises linked above. LATIN IV is an independent study aid with no affiliation to either. All questions, sentences and explanations here are original and were written for this application; none of the published exercise sentences are reproduced.',
-  limitation: 'When this application was built, the UVic site could not be fetched from the build environment (outbound access to hcmc.uvic.ca was blocked), so the exercise pages could not be inspected directly. The grammar content (paradigms, rules) is standard Latin and was verified by independent hand-typed tables and automated tests. The vocabulary was rebuilt to the chapter vocabulary lists of the 7th edition (Chapters 1–4) from the author’s knowledge of the book, since the book itself could not be read here. Please compare Vocabulary ▸ Browse with your textbook; you can correct a chapter, switch a word off, or add a missing word under Vocabulary ▸ Add words. Question styles were modelled on the standard Wheelock exercise types (conjugate, decline, identify, translate) rather than on the UVic pages themselves.',
+  limitation: 'When this application was built, the UVic site could not be fetched from the build environment (outbound access to hcmc.uvic.ca was blocked), so the exercise pages could not be inspected directly. The grammar content (paradigms, rules) is standard Latin and was verified by independent hand-typed tables and automated tests. The vocabulary was rebuilt to the chapter vocabulary lists of the 7th edition (Chapters 1–6) from the author’s knowledge of the book, since the book itself could not be read here. Please compare Vocabulary ▸ Browse with your textbook; you can correct a chapter, switch a word off, or add a missing word under Vocabulary ▸ Add words. Question styles were modelled on the standard Wheelock exercise types (conjugate, decline, identify, translate) rather than on the UVic pages themselves.',
 };

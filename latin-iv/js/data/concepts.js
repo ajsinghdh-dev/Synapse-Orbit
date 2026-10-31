@@ -1,4 +1,4 @@
-// LATIN IV — hand-authored multiple-choice questions, limited to Wheelock (7th ed.) Chapters 1–4.
+// LATIN IV — hand-authored multiple-choice questions, limited to Wheelock (7th ed.) Chapters 1–6.
 // C(chapter, topic, difficulty, prompt, correct, [distractors], explanation, rule, [vocab ids])
 // Exactly ONE option is correct; tests verify that, uniqueness, and chapter limits of every Latin word.
 const C = (ch, topic, diff, prompt, correct, wrong, why, rule, vocab = []) => ({ ch, topic, diff, prompt, correct, wrong, why, rule, vocab });
@@ -107,6 +107,38 @@ export const CONCEPTS = [
   C(4, 'syntax', 3, 'Translate: {Bonī malōs nōn amant.}', 'Good men do not love bad men.', ['Bad men do not love good men.', 'Good men do not love good men.', 'Bad men love good men.'], 'bonī (nom. pl.) is the subject; malōs (acc. pl.) is the object.', 'c4.substantive', ['bonus', 'malus', 'non', 'amo']),
   C(4, 'syntax', 2, 'Which sentence means “The gifts are good”?', 'Dōna bona sunt.', ['Dōnum bonum est.', 'Dōna bonī sunt.', 'Dōna bona est.'], 'Neuter plural subject dōna; neuter plural predicate bona; plural verb sunt.', 'c4.predicate', ['donum', 'bonus', 'sum']),
 
+  // ───────────── Chapter 5
+  C(5, 'tenses', 1, 'Which letters mark the IMPERFECT tense?', '-bā- (amābam, monēbat)', ['-bi- (amābis, monēbit)', '-re (amāre, monēre)', '-te (amāte, monēte)'], 'The imperfect sign is -bā-: amābam, amābās, amābat…', 'c5.imperfect'),
+  C(5, 'tenses', 1, 'Which ending is the 1st person singular FUTURE of a 1st/2nd-conjugation verb?', '-bō', ['-bam', '-bunt', '-bat'], 'Future: -bō, -bis, -bit, -bimus, -bitis, -bunt.', 'c5.future'),
+  C(5, 'tenses', 1, 'What does {laudābit} mean?', 'he/she/it will praise', ['he/she/it was praising', 'he/she/it praises', 'they will praise'], '-bit = 3rd singular future.', 'c5.future', ['laudo']),
+  C(5, 'tenses', 1, 'What does {monēbant} mean?', 'they were warning', ['they will warn', 'they warn', 'we were warning'], '-bant = 3rd plural imperfect: “they were warning / used to warn”.', 'c5.imperfect', ['moneo']),
+  C(5, 'tenses', 2, 'Which form is the 3rd person plural FUTURE of {videō}?', 'vidēbunt', ['vidēbant', 'vident', 'vidēbit'], 'stem vidē- + -bunt.', 'c5.future', ['video']),
+  C(5, 'tenses', 2, 'Which form is the 1st person plural IMPERFECT of {amō}?', 'amābāmus', ['amābimus', 'amāmus', 'amābātis'], 'stem amā- + -bāmus.', 'c5.imperfect', ['amo']),
+  C(5, 'tenses', 2, 'Which is the correct imperfect of {dō} (“I was giving”)?', 'dabam', ['dabō', 'dabat', 'dās'], 'dō keeps its short a: dabam, dabās, dabat… (dabō is future; dabat is 3rd person; dās is present)', 'c5.imperfect', ['do']),
+  C(5, 'tenses', 2, 'How is the imperfect best described?', 'continuing, repeated or habitual action in the past', ['an action that will happen', 'a single completed action', 'a command'], 'The imperfect is the past of continuing action: “was ___ing, used to ___, kept ___ing”.', 'c5.imperfect'),
+  C(5, 'er-adj', 1, 'Which adjective KEEPS its -e- in the other forms?', 'līber, lībera, līberum', ['noster, nostra, nostrum', 'pulcher, pulchra, pulchrum', 'vester, vestra, vestrum'], 'līber keeps the e; noster, pulcher and vester drop it.', 'c5.er-adj', ['liber', 'noster', 'pulcher', 'vester']),
+  C(5, 'er-adj', 2, 'What is the feminine nominative singular of {noster}?', 'nostra', ['nostera', 'noster', 'nostrum'], 'noster, nostra, nostrum: the e drops out.', 'c5.er-adj', ['noster']),
+  C(5, 'er-adj', 2, 'Which phrase means “our fatherland” (subject)?', 'patria nostra', ['patria noster', 'patria nostrum', 'patria nostera'], 'patria is feminine nominative singular: nostra.', 'c5.er-adj', ['patria', 'noster']),
+  C(5, 'er-adj', 2, 'What is the difference between {vester} and {tuus}?', 'vester = “your” of several people; tuus = “your” of one person', ['vester is masculine, tuus is feminine', 'vester means “our”', 'There is no difference'], 'tuus: one owner addressed; vester: more than one.', 'c5.er-adj', ['vester', 'tuus']),
+  C(5, 'prep', 1, 'What case follows {propter}?', 'accusative', ['ablative', 'genitive', 'dative'], 'propter + accusative: propter culpam “because of the fault”.', 'c2.prep', ['propter']),
+  C(5, 'vocab', 2, 'How does the enclitic {-ne} work?', 'It is attached to the first word and turns the sentence into a yes/no question', ['It means “not”', 'It joins two nouns, like “and”', 'It marks the vocative'], 'Valēsne? “Are you well?”', 'vocab', ['ne']),
+
+  // ───────────── Chapter 6
+  C(6, 'sum-possum', 1, 'Which form is the IMPERFECT of {sum}, 3rd person singular?', 'erat', ['erit', 'est', 'erant'], 'Imperfect: eram, erās, erat…; future: erō, eris, erit…', 'c6.sum-tenses', ['sum']),
+  C(6, 'sum-possum', 1, 'Which form is the FUTURE of {sum}, 3rd person plural?', 'erunt', ['erant', 'sunt', 'erit'], 'Future: erō, eris, erit, erimus, eritis, erunt.', 'c6.sum-tenses', ['sum']),
+  C(6, 'sum-possum', 1, 'What does {eritis} mean?', 'you (pl.) will be', ['you (pl.) were', 'you (pl.) are', 'they will be'], 'eritis = 2nd plural future of sum.', 'c6.sum-tenses', ['sum']),
+  C(6, 'sum-possum', 1, 'What does {potest} mean?', 'he/she/it is able, can', ['he/she/it was able', 'they are able', 'he/she/it will be'], 'potest = pot- + est.', 'c6.possum', ['possum']),
+  C(6, 'sum-possum', 2, 'Why is it {possum} but {potes}?', 'pot- becomes pos- before s (pot-sum → possum) but stays pot- before a vowel (pot-es)', ['possum is irregular and potes is regular', 'potes is a different verb', 'Both are imperfect'], 'possum = pot- + sum, assimilated to pos- before s.', 'c6.possum', ['possum']),
+  C(6, 'sum-possum', 1, 'What is the present infinitive of {possum}?', 'posse', ['potesse', 'possere', 'potere'], 'possum, posse, potuī.', 'c6.possum', ['possum']),
+  C(6, 'sum-possum', 2, 'Which form means “we were able”?', 'poterāmus', ['poterimus', 'possumus', 'potestis'], 'Imperfect of possum: poteram, poterās, poterat, poterāmus…', 'c6.possum', ['possum']),
+  C(6, 'sum-possum', 2, 'Which form means “they will be able”?', 'poterunt', ['poterant', 'possunt', 'poterit'], 'Future of possum: poterō … poterunt.', 'c6.possum', ['possum']),
+  C(6, 'compl-inf', 1, 'In {Tolerāre nōn possumus}, what is {tolerāre}?', 'a complementary infinitive completing possumus', ['the subject', 'an imperative', 'a future verb'], 'possum needs an infinitive to complete its meaning: “we cannot endure”.', 'c6.compl-inf', ['tolero', 'possum']),
+  C(6, 'compl-inf', 2, 'Which sentence means “You (sing.) will be able to stay”?', 'Manēre poteris.', ['Manēre poterās.', 'Manēbis posse.', 'Manēre potes.'], 'poteris (future of possum) + infinitive manēre.', 'c6.compl-inf', ['maneo', 'possum']),
+  C(6, 'decl2m', 2, 'What is the nominative plural of {locus} (“places”)?', 'loca', ['locī', 'locōs', 'locae'], 'locus is masculine in the singular, but its plural is usually neuter: loca, -ōrum.', 'c3.decl2m', ['locus']),
+  C(6, 'decl1', 2, 'Why is there no singular form of {īnsidiae}?', 'it is used only in the plural (but translated “plot, ambush”)', ['it is a 2nd-declension noun', 'its singular is īnsidia, which means something else', 'it is indeclinable'], 'īnsidiae, -ārum, f. pl.: plural in form, often singular in meaning.', 'c2.decl1', ['insidiae']),
+  C(6, 'vocab', 2, 'How is {-que} used?', 'It is attached to the second word and means “and”', ['It means “not”', 'It asks a question', 'It is attached to the verb to make it future'], 'puerī puellaeque = puerī et puellae.', 'vocab', ['que']),
+  C(6, 'vocab', 1, 'Which word means “book”?', 'liber, librī', ['līber, lībera, līberum', 'līberī', 'locus, locī'], 'liber (short i) = book; līber (long ī) = free.', 'vocab', ['liber']),
+
   // ───────────── Error correction: choose the correct Latin for a stated meaning
   C(1, 'ec', 2, 'Choose the correct Latin for “If you (sing.) make a mistake, I warn.”', 'Sī errās, moneō.', ['Sī errat, moneō.', 'Sī errās, monēmus.', 'Sī errātis, moneō.'], 'you (sing.) = -s (errās); I = -ō (moneō).', 'c1.endings', ['si', 'erro', 'moneo']),
   C(1, 'ec', 2, 'Choose the correct Latin for “You (pl.) ought to see.”', 'Vidēre dēbētis.', ['Vidēre dēbent.', 'Vidēte dēbētis.', 'Vidētis dēbēre.'], 'dēbētis (you pl. ought) + infinitive vidēre; vidēte would be an imperative.', 'c1.infinitive', ['video', 'debeo']),
@@ -121,5 +153,9 @@ export const CONCEPTS = [
   C(4, 'ec', 2, 'Choose the correct Latin for “The dangers are great.”', 'Perīcula magna sunt.', ['Perīcula magnī sunt.', 'Perīculum magna sunt.', 'Perīcula magna est.'], 'Neuter plural subject, neuter plural predicate adjective, plural verb.', 'c4.predicate', ['periculum', 'magnus', 'sum']),
   C(4, 'ec', 2, 'Choose the correct Latin for “The gift is small.”', 'Dōnum parvum est.', ['Dōnum parvus est.', 'Dōnum parva est.', 'Dōna parvum est.'], 'Neuter singular throughout.', 'c4.predicate', ['donum', 'parvus', 'sum']),
   C(4, 'ec', 2, 'Choose the correct Latin for “We are sailors.”', 'Nautae sumus.', ['Nautae sunt.', 'Nautae estis.', 'Nauta sumus.'], 'sumus = we are; the predicate nominative nautae is plural.', 'c4.sum', ['nauta', 'sum']),
+  C(5, 'ec', 2, 'Choose the correct Latin for “We were praising our friends.”', 'Amīcōs nostrōs laudābāmus.', ['Amīcōs nostrōs laudābimus.', 'Amīcōs noster laudābāmus.', 'Amīcōs nostrōs laudābant.'], 'Imperfect 1st plural -bāmus; nostrōs agrees with amīcōs.', 'c5.imperfect', ['amicus', 'noster', 'laudo']),
+  C(5, 'ec', 2, 'Choose the correct Latin for “The girls will help the sailor.”', 'Puellae nautam adiuvābunt.', ['Puellae nautam adiuvābant.', 'Puella nautam adiuvābunt.', 'Puellae nauta adiuvābunt.'], 'Future 3rd plural -bunt; nautam is the object.', 'c5.future', ['puella', 'nauta', 'adiuvo']),
+  C(6, 'ec', 2, 'Choose the correct Latin for “They were able to remain.”', 'Manēre poterant.', ['Manēre poterunt.', 'Manēbant posse.', 'Manēre possunt.'], 'poterant = imperfect of possum; manēre is the complementary infinitive.', 'c6.compl-inf', ['maneo', 'possum']),
+  C(6, 'ec', 2, 'Choose the correct Latin for “The tyrant will be bad.”', 'Tyrannus malus erit.', ['Tyrannus malus erat.', 'Tyrannus malum erit.', 'Tyrannum malus erit.'], 'erit = future of sum; malus agrees with tyrannus.', 'c6.sum-tenses', ['tyrannus', 'malus', 'sum']),
   C(4, 'ec', 3, 'Choose the correct Latin for “The teacher sees the danger in the field.”', 'Magister perīculum in agrō videt.', ['Magister perīculum in agrō vident.', 'Magister perīculus in agrō videt.', 'Magistrī perīculum in agrō videt.'], 'Singular subject, singular verb; perīculum is a neuter accusative; agrō is ablative after in (place where).', 'c4.sentence', ['magister', 'periculum', 'in', 'ager', 'video']),
 ];
