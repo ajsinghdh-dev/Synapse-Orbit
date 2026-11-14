@@ -152,3 +152,24 @@ export function mission(state, now, { activeIds, examTs }) {
   options.push({ id: 'mixed', title: 'Mixed review, 15 questions', why: 'Interleaving chapters strengthens recall.', minutes: 10, href: '#/practice?ch=all&len=20&diff=adaptive&start=1', label: 'Start' });
   return { primary: options[0], alts: options.slice(1, 3).map((o) => ({ title: o.title, href: o.href, minutes: o.minutes })) };
 }
+
+/** Concrete, data-driven things most likely costing points. Never invents a problem: each item needs evidence in the attempt log. */
+export function boosters(state, now) {
+  const out = []; const A = state.attempts; const DAYS = 86400000;
+  const recent = A.filter((a) => a.t >= now - 14 * DAYS);
+  const macron = recent.filter((a) => a.macronOnly).length;
+  if (macron >= 2) out.push({ id: 'macron', title: `${macron} answers lost only to macrons`, detail: 'The Latin was right but a long mark was missing or wrong. Switch macron checking to strict in Settings so practice matches a strict marker.', href: '#/settings', label: 'Open settings' });
+  const miss = Object.values(state.mistakes).filter((m) => m.status === 'open' && m.count >= 2);
+  if (miss.length) out.push({ id: 'repeat', title: `${miss.length} question${miss.length === 1 ? '' : 's'} missed more than once`, detail: 'Repeated misses are the cheapest points to win back: the same idea is being confused each time.', href: '#/mistakes', label: 'Fix them' });
+  const slow = {}; for (const a of recent) if (a.ms && a.topic) (slow[a.topic] ||= []).push(a.ms);
+  const med = (l) => [...l].sort((x, y) => x - y)[Math.floor(l.length / 2)];
+  const all = recent.filter((a) => a.ms).map((a) => a.ms);
+  if (all.length >= 20) { const m0 = med(all); const sl = Object.entries(slow).filter(([, l]) => l.length >= 4).map(([t, l]) => [t, med(l)]).filter(([, m]) => m > m0 * 1.8).sort((x, y) => y[1] - x[1])[0]; if (sl) out.push({ id: 'slow', title: `${TOPICS[sl[0]]?.label || sl[0]} is slow for you`, detail: `Your median answer takes ${Math.round(sl[1] / 1000)} s, about ${(sl[1] / m0).toFixed(1)}× your usual. On a timed exam, slow means unfinished.`, href: `#/practice?topic=${sl[0]}&len=10&diff=adaptive&start=1`, label: 'Drill for speed' }); }
+  const w = weakest(state, now, 1, 4)[0];
+  if (w && w.acc < 0.85) out.push({ id: 'weak', title: `${w.label}: ${Math.round(w.acc * 100)}% accurate`, detail: 'Your lowest measured skill. A short adaptive set targets exactly the forms you miss.', href: `#/practice?topic=${w.topic}&len=10&diff=adaptive&start=1`, label: 'Practise it' });
+  const untouched = CH_LIST.filter((c) => A.filter((a) => a.ch === c).length < 5);
+  if (untouched.length && A.length >= 10) out.push({ id: 'new', title: `Chapter${untouched.length > 1 ? 's' : ''} ${untouched.join(', ')} barely practised`, detail: 'A midterm can draw on any chapter it covers. Unmeasured chapters are the biggest unknown in your score.', href: `#/practice?ch=${untouched[0]}&len=10&diff=adaptive&start=1`, label: `Try Chapter ${untouched[0]}` });
+  const mocks = (state.mocks || []).length;
+  if (A.length >= 40 && !mocks) out.push({ id: 'mock', title: 'No timed mock yet', detail: 'Accuracy under a clock is a different skill from accuracy at your own pace. One quick timed test shows the gap.', href: '#/mock?fmt=quick', label: 'Take a quick test' });
+  return out.slice(0, 4);
+}

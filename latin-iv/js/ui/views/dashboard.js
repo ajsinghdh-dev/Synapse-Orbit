@@ -1,4 +1,4 @@
-import { readiness, chapterStats, mission, streak, todayCount, dueCounts, weakest, mostImproved, openMistakes, READINESS_WEIGHTS, localDay } from '../../core/analytics.js';
+import { readiness, chapterStats, boosters, mission, streak, todayCount, dueCounts, weakest, mostImproved, openMistakes, READINESS_WEIGHTS, localDay } from '../../core/analytics.js';
 import { art } from '../art.js';
 import { CHAPTERS } from '../../data/lexicon.js';
 import { TOPICS } from '../../data/curriculum.js';
@@ -39,17 +39,18 @@ export default function dashboard({ root, store, now, activeIds }) {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const exStr = new Date(ex).toLocaleString([], { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     const resumeMock = st.inprogress.mock, resumePrac = st.inprogress.practice;
+    const bst = boosters(st, t);
     const chs = CHAPTERS.map((c) => ({ c, s: chapterStats(st, t, c.n, act) }));
 
     root.innerHTML = `
-      <div class="hello">${mascot(st.attempts.length ? 'happy' : 'cheer', 92)}<div class="grow"><div class="inscr">Salvē, discipule!</div><h2 class="mt1">${st.attempts.length ? `Welcome back. ${streak(st, t) ? streak(st, t) + '-day streak — keep it going!' : 'Ready for today’s lesson?'}` : 'I’m Lupulus. Let’s get you ready!'}</h2><p>${esc(ms.primary.title)}</p></div>${art('discobolus', 'hello-art')}</div>
+      <div class="hello">${mascot(st.attempts.length ? 'happy' : 'cheer', 92)}<div class="grow"><div class="inscr">S · P · Q · R &nbsp;—&nbsp; Salvē, discipule</div><h2 class="mt1">${st.attempts.length ? `Welcome back. ${streak(st, t) ? streak(st, t) + '-day streak — keep it going!' : 'Ready for today’s lesson?'}` : 'I’m Lupulus. Let’s get you ready!'}</h2><p>${esc(ms.primary.title)}</p></div>${art('discobolus', 'hello-art')}</div>
       <div class="page-head"><div><h1>Today</h1><p>What to study right now to move your exam score the most.</p></div>
         <div class="row" style="gap:var(--s5)"><div class="statchips" aria-label="Your stats"><span class="statchip fire" title="Day streak">${icon('flame')}${streak(st, t)}</span><span class="statchip xp" title="XP">${icon('bolt')}${st.xp}</span><span class="statchip goal" title="Today’s questions">${icon('target')}${today}/${target}</span></div><button class="btn primary lg" id="quick">${icon('play')}Quick Start</button></div></div>
 
       <div class="hero">
         <section class="card gold" aria-labelledby="cd-h">
           <div class="card-head"><h3 id="cd-h">Exam countdown</h3><button class="btn quiet sm" id="edit-exam">Edit time</button></div>
-          ${cd.done ? '<p class="display" style="font-size:28px">The exam time has passed. Good luck with the result — vale!</p>' : `
+          ${cd.done ? '<p class="display" style="font-size:24px">The exam date you set has passed. Set the next one and the countdown returns.</p>' : `
           <div class="count" aria-live="off"><span><span class="n">${cd.d}</span> <span class="u">days</span></span><span><span class="n">${String(cd.h).padStart(2, '0')}</span> <span class="u">hrs</span></span><span><span class="n">${String(cd.m).padStart(2, '0')}</span> <span class="u">min</span></span></div>
           <p class="mb0"><strong>${plural(cd.studyDays, 'study day')}</strong> left, counting today. <span class="muted">Exam: ${esc(exStr)} (${esc(tz)}).</span></p>`}
         </section>
@@ -59,7 +60,7 @@ export default function dashboard({ root, store, now, activeIds }) {
             <div class="col grow" style="gap:6px">${rd.score == null
               ? '<p class="mb0"><strong>Not enough data yet.</strong> Answer at least 6 questions in a category (vocabulary, grammar or translation) and an estimate appears. Nothing is assumed in advance.</p>'
               : Object.entries(rd.comps).map(([k, v]) => `<div class="meter"><div class="top"><span>${COMP_LABEL[k]}</span><span class="muted">${pct(v.acc)} · ${v.n}</span></div><div class="bar"><i style="width:${v.acc * 100}%"></i></div></div>`).join('')}</div></div>
-          <p class="tiny muted mt2 mb0">An <strong>estimate</strong> from your own results (recent answers count more) — not a prediction of your grade.${rd.score != null ? ` Based on ${rd.n} answers across ${rd.chaptersAssessed} of 4 chapters${rd.missing.length ? '; not yet measured: ' + rd.missing.map((k) => COMP_LABEL[k].toLowerCase()).join(', ') : ''}.` : ''} <a href="#" id="how">How is this calculated?</a></p>
+          <p class="tiny muted mt2 mb0">An <strong>estimate</strong> from your own results (recent answers count more) — not a prediction of your grade.${rd.score != null ? ` Based on ${rd.n} answers across ${rd.chaptersAssessed} of ${CHAPTERS.length} chapters${rd.missing.length ? '; not yet measured: ' + rd.missing.map((k) => COMP_LABEL[k].toLowerCase()).join(', ') : ''}.` : ''} <a href="#" id="how">How is this calculated?</a></p>
         </section>
       </div>
 
@@ -67,6 +68,8 @@ export default function dashboard({ root, store, now, activeIds }) {
         <div><div class="caps">Today’s mission${ms.primary.minutes ? ' · about ' + ms.primary.minutes + ' min' : ''}</div><h2 id="ms-h" class="mt1">${esc(ms.primary.title)}</h2><p class="mt1 mb0" style="color:var(--ink-2);max-width:60ch">${esc(ms.primary.why)}</p>
           ${ms.alts.length ? `<div class="small muted mt2">Or: ${ms.alts.map((a) => `<a href="${a.href}">${esc(a.title)}</a>`).join(' · ')}</div>` : ''}</div>
         <a class="btn primary lg" href="${ms.primary.href}">${esc(ms.primary.label || 'Start')} ${icon('arrow')}</a></div></section>
+
+      ${bst.length ? `<section class="card mt2 boost" aria-labelledby="bs-h"><div class="card-head"><h3 id="bs-h">Score boosters</h3><span class="small muted">from your own answers</span></div><div class="boost-grid">${bst.map((b) => `<a class="boost-i" href="${b.href}"><strong>${esc(b.title)}</strong><span>${esc(b.detail)}</span><em>${esc(b.label)} ${icon('arrow')}</em></a>`).join('')}</div></section>` : ''}
 
       <section class="card mt2" aria-labelledby="rt-h"><div class="card-head"><h3 id="rt-h">Today’s routine</h3><span class="small muted">about 45 min · the research order</span></div>
         <ol class="routine">
@@ -83,9 +86,9 @@ export default function dashboard({ root, store, now, activeIds }) {
       <a class="card mt2 soft" href="#/games" style="text-decoration:none;color:inherit;display:block"><div class="row between"><div><div class="caps">Take a break that still counts</div><strong class="display" style="font-size:22px">Legion Rush</strong> <span class="small muted">— fight waves of enemies with your Latin${st.game && st.game.best ? ' · high score ' + st.game.best : ''}</span></div><span class="btn sm">Play ${icon('arrow')}</span></div></a>
 
       <h2 class="mt4" style="margin-bottom:var(--s3)">Chapter mastery</h2>
-      <div class="grid g3">${chs.map(({ c, s }) => `
+      <div class="chgrid">${chs.map(({ c, s }) => `
         <a class="card ch-card ${s.acc == null ? 'empty' : ''}" href="#/practice?ch=${c.n}&len=10&diff=adaptive&start=1" style="text-decoration:none;color:inherit" aria-label="Chapter ${c.n}">
-          <div class="row" style="flex-wrap:nowrap"><span class="ch-ico c${c.n}">${['I', 'II', 'III', 'IV', 'V', 'VI'][c.n - 1]}</span><div><div class="num caps">Chapter ${c.n}</div><div style="font-weight:800;line-height:1.2">${esc(c.title)}</div></div></div>
+          <div class="row" style="flex-wrap:nowrap"><span class="ch-ico c${c.n}">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][c.n - 1]}</span><div><div class="num caps">Chapter ${c.n}</div><div style="font-weight:800;line-height:1.2">${esc(c.title)}</div></div></div>
           <div class="pct">${s.acc == null ? '—' : pct(s.acc)}</div>
           <div class="meter"><div class="top"><span class="muted">Completion</span><span>${pct(s.completion)}</span></div><div class="bar"><i style="width:${s.completion * 100}%"></i></div></div>
           <div class="small">${s.weak.length ? '<span class="muted">Weak:</span> ' + s.weak.map((w) => esc(w.label)).join(', ') : '<span class="muted">' + (s.n < 5 ? 'No weak areas measured yet' : 'No weak areas flagged') + '</span>'}</div>

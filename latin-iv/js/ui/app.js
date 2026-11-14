@@ -3,7 +3,7 @@ import '../core/custom-boot.js';
 import { createStore } from '../core/store.js';
 import { initCloud, cloud } from '../core/cloud.js';
 import { session } from '../core/session.js';
-import { art, PLATE } from './art.js';
+import { plate, PLATE } from './art.js';
 import { showSignin } from './views/signin.js';
 import { LEXICON } from '../data/lexicon.js';
 import { $, $$, esc, icon, initMacronBar, openModal, toast, download, confirmDialog } from './util.js';
@@ -77,7 +77,7 @@ function whoLabel() {
 }
 function exLabel(short = false) {
   const n = daysLeftLabel();
-  if (n < 0) return 'Exam day has passed';
+  if (n < 0) return 'Set your next exam date';
   if (n === 0) return short ? 'Exam today' : 'Exam is today';
   return short ? `${n} day${n === 1 ? '' : 's'} to exam` : `${n} study day${n === 1 ? '' : 's'} until the exam`;
 }
@@ -110,8 +110,8 @@ async function route() {
 
 // art plate on every section header (views re-render themselves, so watch for new headers)
 function decorate() {
-  const h = $('#main .page-head'); const plate = PLATE[parseHash().name];
-  if (h && plate && !h.querySelector('.art')) { h.classList.add('has-art'); h.insertAdjacentHTML('beforeend', art(plate, 'head-art')); }
+  const h = $('#main .page-head'); const pl = PLATE[parseHash().name];
+  if (h && pl && !h.querySelector('.plate')) { h.classList.add('has-art'); h.insertAdjacentHTML('beforeend', plate(pl, 'head-art')); }
 }
 new MutationObserver(decorate).observe($('#main'), { childList: true, subtree: true });
 

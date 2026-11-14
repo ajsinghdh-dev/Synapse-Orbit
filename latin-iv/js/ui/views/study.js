@@ -6,12 +6,13 @@ import { localDay } from '../../core/analytics.js';
 
 export default function study({ root, store, now, q: Q }) {
   const st = store.state;
-  const ch = +Q.ch || 0;
   const today = localDay(now());
+  const planOver = today > PLAN[PLAN.length - 1].date;
+  const ch = +Q.ch || (planOver ? CHAPTERS.length : 0);
   const idx = PLAN.findIndex((d) => d.date === today);
   const cur = idx >= 0 ? idx : today < PLAN[0].date ? 0 : PLAN.length - 1;
-  root.innerHTML = `<div class="page-head"><div><h1>Study</h1><p>Short sessions, each ending in active recall. Follow the five-day plan or read a chapter.</p></div></div>
-  <div class="tabs"><a href="#/study" ${!ch ? 'aria-current="page"' : ''}>Five-day plan</a>${CHAPTERS.map((c) => `<a href="#/study?ch=${c.n}" ${ch === c.n ? 'aria-current="page"' : ''}>Chapter ${c.n}</a>`).join('')}</div><div id="body"></div>`;
+  root.innerHTML = `<div class="page-head"><div><h1>Study</h1><p>Short sessions, each ending in active recall. Read a chapter, then test yourself on it.</p></div></div>
+  <div class="tabs">${planOver ? '' : `<a href="#/study" ${!ch ? 'aria-current="page"' : ''}>Five-day plan</a>`}${CHAPTERS.map((c) => `<a href="#/study?ch=${c.n}" ${ch === c.n ? 'aria-current="page"' : ''}>Chapter ${c.n}</a>`).join('')}</div><div id="body"></div>`;
   const body = $('#body', root);
   if (!ch) {
     const DX = ['0px', '56px', '84px', '56px', '0px', '-56px', '-84px', '-56px'];
