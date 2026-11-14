@@ -656,3 +656,51 @@ hr.sep { border-top-color: var(--line); }
 /* dark mode: keep the blue identity */
 @media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --bg: #0B0B1F; --bg-2: #07071A; --surface: #13133A; --surface-2: #1B1B48; --line: #2A2A60; --line-2: #3A3A78; --ink: #F2F2FF; --ink-2: #D2D4FF; --ink-3: #9FA3D9; --hb: #6F73FF; --hb-2: #5C60F0; --hb-soft: #1C1F5E; --hb-tint: #3B3FA8; --hg: #0B0B1F; --hg-2: #13133A; } }
 :root[data-theme="dark"] { --bg: #0B0B1F; --bg-2: #07071A; --surface: #13133A; --surface-2: #1B1B48; --line: #2A2A60; --line-2: #3A3A78; --ink: #F2F2FF; --ink-2: #D2D4FF; --ink-3: #9FA3D9; --hb: #6F73FF; --hb-2: #5C60F0; --hb-soft: #1C1F5E; --hb-tint: #3B3FA8; --hg: #0B0B1F; --hg-2: #13133A; }
+
+/* =====================================================================
+   ART PLATES + SIGN-IN SCREEN
+   White engraving tone on electric-blue tiles.
+   ===================================================================== */
+.art { display: block; background-position: center; background-repeat: no-repeat; background-size: contain; flex: none; }
+.page-head.has-art { padding-right: 132px; min-height: 124px; align-items: flex-end; }
+.head-art { position: absolute; right: 0; bottom: 0; width: 116px; height: 116px; aspect-ratio: auto !important; background-color: #1414F5; background-size: cover; background-position: center 20%; }
+.hello { position: relative; overflow: hidden; }
+.hello-art { width: 170px; align-self: flex-end; margin: calc(var(--s4) * -1) calc(var(--s5) * -1) calc(var(--s4) * -1) 0; opacity: .95; }
+.who { display: flex; flex-direction: column; gap: 2px; text-decoration: none; padding: 8px 10px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,.35); color: #fff; }
+.who span { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #C9CCFF; font-weight: 400; }
+.who b { font-family: var(--font-display); font-size: 17px; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who:hover { background: var(--hb-2); }
+
+body.gate { overflow: auto; background: #1414F5; }
+body.gate #app, body.gate #macron-bar { display: none !important; }
+.signin { min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); background: #1414F5; color: #fff; }
+.si-copy { display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: clamp(24px, 5vw, 72px); padding-top: max(clamp(24px, 5vw, 72px), env(safe-area-inset-top)); }
+.si-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.si-top b { font-family: var(--font-display); font-weight: 600; font-size: 26px; letter-spacing: .14em; }
+.si-top b i { font-style: normal; opacity: .6; }
+.si-top span, .si-note { font-family: var(--font-mono); font-size: 12px; color: #C9CCFF; letter-spacing: .02em; }
+.signin h1 { color: #fff; font-size: clamp(46px, 6.6vw, 100px); line-height: .9; font-weight: 500; margin: 0; text-wrap: balance; }
+.si-lead { font-size: 18px; line-height: 1.5; color: #E6E7FF; max-width: 46ch; margin: 0; }
+.si-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.signin .btn.si-go { background: #fff; color: #1414F5; }
+.signin .btn.si-go:hover { background: #E6E7FF; }
+.signin .btn.si-alt { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.6); }
+.signin .btn.si-alt:hover { background: #0A0AD8; }
+.signin .btn:disabled { opacity: .6; cursor: default; }
+.signin .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.si-note { max-width: 58ch; line-height: 1.6; margin: 0; }
+.si-facts { list-style: none; display: flex; gap: 28px; flex-wrap: wrap; padding: 18px 0 0; margin: 0; border-top: 1px solid rgba(255,255,255,.3); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #C9CCFF; }
+.si-facts b { display: block; font-family: var(--font-display); font-size: 40px; font-weight: 500; letter-spacing: 0; color: #fff; line-height: 1; }
+.si-art { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; background: #0A0AD8; padding: 24px 24px 0; overflow: hidden; }
+.si-art { max-height: 100vh; max-height: 100dvh; position: sticky; top: 0; }
+.si-hero { flex: 1; min-height: 0; width: 100%; aspect-ratio: auto !important; background-position: center bottom; }
+.si-strip { display: grid; grid-template-columns: repeat(3, 1fr); width: calc(100% + 48px); border-top: 1px solid rgba(255,255,255,.3); }
+.si-strip .art { height: 120px; width: 100%; aspect-ratio: auto !important; border-right: 1px solid rgba(255,255,255,.3); background-size: auto 92%; background-position: center bottom; }
+.si-strip .art:last-child { border-right: 0; }
+@media (max-width: 860px) {
+  .signin { grid-template-columns: 1fr; }
+  .si-art { padding-top: 16px; max-height: none; position: static; } .si-hero { flex: none; width: min(78%, 360px); aspect-ratio: 433/520 !important; } .si-strip .art { height: 84px; }
+  .page-head.has-art { padding-right: 84px; min-height: 0; } .head-art { width: 72px; height: 72px; }
+  .hello-art { width: 110px; }
+}
+@media (max-width: 520px) { .hello-art { display: none; } .si-facts { gap: 18px; } .si-facts b { font-size: 30px; } }

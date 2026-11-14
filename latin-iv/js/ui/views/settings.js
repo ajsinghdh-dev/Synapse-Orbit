@@ -1,12 +1,13 @@
 import { esc, icon, toast, download, confirmDialog, $ } from '../util.js';
 import { applyTheme } from '../app.js';
 import { cloud } from '../../core/cloud.js';
+import { session } from '../../core/session.js';
 
 export default function settings({ root, store }) {
   const s = store.state.settings;
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   root.innerHTML = `
-    <div class="page-head"><div><h1>Settings</h1><p>Everything is stored on this device. Nothing is sent anywhere.</p></div></div>
+    <div class="page-head"><div><h1>Settings</h1><p>Your account, exam date and how the app behaves.</p></div></div>
     <div class="grid g2">
       <section class="card col"><h3>Exam</h3>
         <div class="field"><label for="s-date">Exam date</label><input id="s-date" class="input" type="date" value="${esc(s.examDate)}"></div>
@@ -22,7 +23,7 @@ export default function settings({ root, store }) {
         <label class="switch"><input type="checkbox" id="s-acc" ${s.accommodationHints ? 'checked' : ''}> Accommodation: allow hints during mock exams</label>
         <label class="switch"><input type="checkbox" id="s-timer" ${s.timerVisible ? 'checked' : ''}> Show the timer in mock exams</label>
       </section>
-      <section class="card col"><h3>Account sync</h3><p class="small mb0" id="cl"></p><p class="small muted mb0">Your progress is saved to your Claude account and shared by every device you open this page on (iPad, Mac, phone). If two devices change at once, the most recent save wins.</p><div class="row"><button class="btn" id="sync">Sync now</button></div></section>
+      <section class="card col"><h3>Account</h3><p class="mb0" id="acct"></p><p class="small mb0" id="cl"></p><p class="small muted mb0" id="acct-note"></p><div class="row"><button class="btn" id="sync">Sync now</button><button class="btn" id="signout">Sign out</button></div></section>
       <section class="card col"><h3>Your data</h3>
         <p class="small muted">${store.persistent ? 'Saved in this browser on this device.' : '<strong style="color:var(--bad)">Storage is unavailable (private window?)</strong> — progress will be lost when you close the tab. Export a backup below.'} Export a backup file to move your progress between devices.</p>
         <div class="row"><button class="btn" id="exp">${icon('arrow')}Export backup</button><label class="btn" style="cursor:pointer">Import backup<input id="imp" type="file" accept="application/json" hidden></label></div>
@@ -34,8 +35,18 @@ export default function settings({ root, store }) {
         <p class="small muted mb0">Not sure a word is in your course? Chapter placement is marked <span class="badge">confirm</span> where it should be checked against your textbook.</p>
       </section>
     </div>`;
-  const paint = () => { const el = $('#cl', root); if (el) el.innerHTML = `<strong>${esc(cloud.msg)}</strong>${cloud.at ? ' · ' + new Date(cloud.at).toLocaleTimeString() : ''}`; };
+  const mode = (session.get() || {}).mode;
+  $('#acct-note', root).textContent = mode === 'account'
+    ? 'Progress is saved privately to your Claude account and shared by every device you sign in on (iPad, Mac, phone). If two devices change at once, the most recent save wins.'
+    : 'You chose to use this device only, so progress lives in this browser and is not synced. Sign out and choose your Claude account to sync.';
+  if (mode !== 'account') $('#sync', root).hidden = true;
+  const paint = () => { const a = $('#acct', root); if (a) a.innerHTML = mode === 'account' ? `Signed in as <strong>${esc((cloud.who && cloud.who.name) || 'your Claude account')}</strong>` : '<strong>This device only</strong>'; const el = $('#cl', root); if (mode !== 'account') { if (el) el.hidden = true; return; } if (el) el.innerHTML = `<strong>${esc(cloud.msg)}</strong>${cloud.at ? ' · ' + new Date(cloud.at).toLocaleTimeString() : ''}`; };
   paint(); cloud.subs.add(paint); $('#sync', root).onclick = () => cloud.syncNow();
+  $('#signout', root).onclick = async () => {
+    if (!(await confirmDialog({ title: 'Sign out?', body: 'You will return to the welcome screen. Your progress is kept' + (mode === 'account' ? ' in your account and on this device.' : ' on this device.'), ok: 'Sign out' }))) return;
+    store.flush(); if (mode === 'account') await cloud.flush().catch(() => {});
+    session.end(); location.hash = '#/dashboard'; location.reload();
+  };
   const on = (sel, ev, f) => $(sel, root).addEventListener(ev, f);
   on('#s-date', 'change', (e) => { if (e.target.value) { store.setSetting('examDate', e.target.value); toast('Exam date saved'); } });
   on('#s-time', 'change', (e) => { if (e.target.value) { store.setSetting('examTime', e.target.value); toast('Exam time saved'); } });

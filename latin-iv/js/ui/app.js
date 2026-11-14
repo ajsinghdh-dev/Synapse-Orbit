@@ -1,7 +1,10 @@
 // LATIN IV — application shell: router, navigation, theme, settings.
 import '../core/custom-boot.js';
 import { createStore } from '../core/store.js';
-import { initCloud } from '../core/cloud.js';
+import { initCloud, cloud } from '../core/cloud.js';
+import { session } from '../core/session.js';
+import { art, PLATE } from './art.js';
+import { showSignin } from './views/signin.js';
 import { LEXICON } from '../data/lexicon.js';
 import { $, $$, esc, icon, initMacronBar, openModal, toast, download, confirmDialog } from './util.js';
 
@@ -56,6 +59,7 @@ function renderChrome() {
     <a class="brand" href="#/dashboard" aria-label="LATIN IV home"><b>LATIN <i>IV</i></b><span>Master the language. Conquer the exam.</span></a>
     <nav class="nav" aria-label="Sections">${NAV.map(([k, l, i]) => `<a href="#/${k}"${cur(k)}>${icon(i)}<span>${l}</span></a>`).join('')}</nav>
     <div class="side-foot">
+      <a class="who" href="#/settings">${whoLabel()}</a>
       <div class="small muted">${exLabel()}</div>
       <div class="row between"><span class="motto">Festīnā lentē</span>
         <span class="row tight"><button class="iconbtn" data-theme-toggle aria-label="Toggle light / dark mode">${icon(isDark() ? 'sun' : 'moon')}</button><a class="iconbtn" href="#/settings" aria-label="Settings" ${name === 'settings' ? 'aria-current="page"' : ''}>${icon('gear')}</a></span></div>
@@ -65,6 +69,11 @@ function renderChrome() {
   $('#tabbar').innerHTML = `<a href="#/dashboard"${cur('dashboard')}>${icon('home')}Home</a><a href="#/study"${cur('study')}>${icon('study')}Study</a><a href="#/vocabulary"${cur('vocabulary')}>${icon('vocab')}Vocab</a><a href="#/grammar"${cur('grammar')}>${icon('grammar')}Grammar</a><button data-more${more ? ' aria-current="page"' : ''}>${icon('more')}More</button>`;
   $$('[data-theme-toggle]').forEach((b) => (b.onclick = toggleTheme));
   const mb = $('[data-more]'); if (mb) mb.onclick = openMore;
+}
+function whoLabel() {
+  const m = (session.get() || {}).mode;
+  if (m === 'account') return `<span>Signed in</span><b>${esc((cloud.who && cloud.who.name) || 'Claude account')}</b>`;
+  return '<span>This device only</span><b>Not synced</b>';
 }
 function exLabel(short = false) {
   const n = daysLeftLabel();
@@ -99,13 +108,23 @@ async function route() {
   main.focus({ preventScroll: true });
 }
 
-addEventListener('hashchange', route);
+// art plate on every section header (views re-render themselves, so watch for new headers)
+function decorate() {
+  const h = $('#main .page-head'); const plate = PLATE[parseHash().name];
+  if (h && plate && !h.querySelector('.art')) { h.classList.add('has-art'); h.insertAdjacentHTML('beforeend', art(plate, 'head-art')); }
+}
+new MutationObserver(decorate).observe($('#main'), { childList: true, subtree: true });
+
+function start() {
+  route();
+  if ((session.get() || {}).mode === 'account') { let seen = null; cloud.subs.add(() => { const n = cloud.who && cloud.who.name; if (n !== seen) { seen = n; renderChrome(); } }); initCloud(store); }
+}
+addEventListener('hashchange', () => { if (session.on()) route(); });
 addEventListener('beforeunload', () => store.flush());
 document.addEventListener('visibilitychange', () => { if (document.hidden) store.flush(); });
 initMacronBar();
 applyTheme();
-route();
-initCloud(store);
+if (session.on()) start(); else showSignin(start);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !nowParam) navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__latin = { store };
 void toast; void download; void confirmDialog;

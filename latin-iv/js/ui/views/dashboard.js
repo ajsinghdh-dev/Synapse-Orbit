@@ -1,4 +1,5 @@
 import { readiness, chapterStats, mission, streak, todayCount, dueCounts, weakest, mostImproved, openMistakes, READINESS_WEIGHTS, localDay } from '../../core/analytics.js';
+import { art } from '../art.js';
 import { CHAPTERS } from '../../data/lexicon.js';
 import { TOPICS } from '../../data/curriculum.js';
 import { Q_BY_ID } from '../../core/questions.js';
@@ -41,7 +42,7 @@ export default function dashboard({ root, store, now, activeIds }) {
     const chs = CHAPTERS.map((c) => ({ c, s: chapterStats(st, t, c.n, act) }));
 
     root.innerHTML = `
-      <div class="hello">${mascot(st.attempts.length ? 'happy' : 'cheer', 92)}<div class="grow"><div class="inscr">Salvē, discipule!</div><h2 class="mt1">${st.attempts.length ? `Welcome back. ${streak(st, t) ? streak(st, t) + '-day streak — keep it going!' : 'Ready for today’s lesson?'}` : 'I’m Lupulus. Let’s get you ready!'}</h2><p>${esc(ms.primary.title)}</p></div></div>
+      <div class="hello">${mascot(st.attempts.length ? 'happy' : 'cheer', 92)}<div class="grow"><div class="inscr">Salvē, discipule!</div><h2 class="mt1">${st.attempts.length ? `Welcome back. ${streak(st, t) ? streak(st, t) + '-day streak — keep it going!' : 'Ready for today’s lesson?'}` : 'I’m Lupulus. Let’s get you ready!'}</h2><p>${esc(ms.primary.title)}</p></div>${art('discobolus', 'hello-art')}</div>
       <div class="page-head"><div><h1>Today</h1><p>What to study right now to move your exam score the most.</p></div>
         <div class="row" style="gap:var(--s5)"><div class="statchips" aria-label="Your stats"><span class="statchip fire" title="Day streak">${icon('flame')}${streak(st, t)}</span><span class="statchip xp" title="XP">${icon('bolt')}${st.xp}</span><span class="statchip goal" title="Today’s questions">${icon('target')}${today}/${target}</span></div><button class="btn primary lg" id="quick">${icon('play')}Quick Start</button></div></div>
 
