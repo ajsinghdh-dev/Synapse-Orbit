@@ -89,7 +89,7 @@ export function whyVerbForm(lex, idx) {
   if (lex.irreg === 'possum') return `${L(form)} is ${PERS_LABEL[idx]} of {possum} = {pot-}/{pos-} + {sum}: {possum, potes, potest, possumus, potestis, possunt}.`;
   const endings = ['-ō', '-s', '-t', '-mus', '-tis', '-nt'];
   const person = PERS_LABEL[idx];
-  if (lex.conj === 3) return `${L(form)} = ${L(p.base + '-')} + ${L(['-ō', '-is', '-it', '-imus', '-itis', '-unt'][idx])} (${person}). The 3rd conjugation stem vowel is a short -e- (${L(lex.pp[1])}); before most endings it weakens to -i-, and before -nt it becomes -u- (${L('-unt')}). In the 1st person singular it simply disappears.`;
+  if (lex.conj === 3) return `${L(form)} = ${L(p.base + '-')} + ${L(['-ō', '-is', '-it', '-imus', '-itis', '-unt'][idx])} (${person}). The 3rd conjugation stem vowel is a short -e- (${L(lex.pp[1])}); the short e weakens to -i- before most endings, becomes -u- before -nt (${L('-unt')}), and disappears before -ō. ${idx === 0 ? '' : idx === 5 ? 'Here it appears as -u- (-unt).' : 'Here it appears as -i-.'}`;
   if (lex.irreg === 'do') return `${L(form)} = {d-} + the stem vowel a + ${L(endings[idx])}: ${person}. In {dō} the a is short everywhere except {dās} (and the imperative {dā}).`;
   if (idx === 0) return `${L(form)}: the 1st person singular ending is ${L('-ō')}; ${lex.conj === 1 ? 'the stem vowel ā disappears before it' : 'the stem is {' + p.base + 'e-}'} — the first principal part is itself this form.`;
   return `${L(form)} = present stem ${L(p.stem + '-')} + ${L(endings[idx])} (${person}).${idx === 2 || idx === 5 ? ' The vowel is short before final -t / -nt.' : ' The stem vowel stays long.'}`;
@@ -236,6 +236,7 @@ function genNouns() {
     const head = `${L(w.la + ', ' + w.gen)} (${w.en[0]})`;
     for (const [c, n] of NCELLS) {
       if (c === 'voc' && (w.type === '3' || w.type === '3n')) continue;   // identical to the nominative
+      if (c === 'nom' && n === 'sg' && (w.type === '3' || w.type === '3n')) continue;   // the headword itself: asking for it teaches nothing
       if (c === 'voc' && !w.anim && !(w.type === 'um' || w.type === 'ium')) continue;
       if (w.plOnly && n === 'sg') continue;
       if (w.sgOnly && n === 'pl') continue;
@@ -259,7 +260,7 @@ function genNouns() {
     out.push(finish({ id: `stem:${w.id}`, ch: w.ch, topic: set, diff: 2, type: 'typed', lang: 'la', prompt: `Give the stem of ${head}. Drop the genitive ending, e.g. ${stemExample(w)}.`, accept: (() => { const s = w.stem || (w.type === 'a' ? w.la.slice(0, -1) : w.la.slice(0, -2)); return [s, s + '-']; })(), explanation: `The stem comes from the genitive singular ${L(w.gen)}. ${w.note || ''}`, rule, vocab: [w.id] }));
     if (w.gender !== 'mf') {
       const gl = { m: 'masculine', f: 'feminine', n: 'neuter' };
-      out.push(finish({ id: `gender:${w.id}`, ch: w.ch, topic: 'gender', diff: w.type === 'a' && w.gender === 'm' ? 3 : 1, type: 'mcq', prompt: `What is the grammatical gender of ${L(w.la + ', ' + w.gen)} (${w.en[0]})?`, options: ['masculine', 'feminine', 'neuter'], answer: gl[w.gender], explanation: `${L(w.la)} is ${gl[w.gender]}. ${w.type === 'a' && w.gender === 'm' ? 'First-declension nouns naming men are masculine: gender is not decided by the -a ending.' : w.type === 'a' ? 'Most first-declension nouns are feminine.' : w.type === 'um' || w.type === 'ium' ? 'Second-declension nouns in -um are neuter.' : 'Second-declension nouns in -us / -er are masculine.'}`, rule: 'c2.gender', vocab: [w.id] }));
+      out.push(finish({ id: `gender:${w.id}`, ch: w.ch, topic: 'gender', diff: w.type === 'a' && w.gender === 'm' ? 3 : 1, type: 'mcq', prompt: `What is the grammatical gender of ${L(w.la + ', ' + w.gen)} (${w.en[0]})?`, options: ['masculine', 'feminine', 'neuter'], answer: gl[w.gender], explanation: `${L(w.la)} is ${gl[w.gender]}. ${w.type === 'a' && w.gender === 'm' ? 'First-declension nouns naming men are masculine: gender is not decided by the -a ending.' : w.type === 'a' ? 'Most first-declension nouns are feminine.' : w.type === 'um' || w.type === 'ium' ? 'Second-declension nouns in -um are neuter.' : w.type === '3' || w.type === '3n' ? 'Third-declension gender is not shown by the nominative: learn it with each noun (the entry gives it as ' + w.gender + '.).' : 'Second-declension nouns in -us / -er are masculine.'}`, rule: 'c2.gender', vocab: [w.id] }));
     }
   }
   return out;

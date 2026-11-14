@@ -40,7 +40,7 @@ export function casesTable() {
 /** One tense of several verbs, with the tense sign highlighted. */
 export function tenseTable(ids, t) {
   const vs = ids.map((i) => BY_ID[i]); const ps = vs.map(conjugate);
-  const hl = (f, v, p) => { const n = v.conj === 3 ? p.base.length : p.stem.length; return v.irreg ? esc(f) : `<span class="st">${esc(f.slice(0, n))}</span><span class="end">${esc(f.slice(n))}</span>`; };
+  const hl = (f, v, p) => { if (v.irreg) return esc(f); const n = v.conj === 3 ? p.base.length : p.stem.length; return `<span class="st">${esc(f.slice(0, n))}</span><span class="end">${esc(f.slice(n))}</span>`; };
   return `<div class="tscroll"><table class="ptable"><thead><tr><th>${TENSE_NAME[t] || 'present'}</th>${vs.map((v) => `<th colspan="2"><span class="la">${esc(v.pp[0])}, ${esc(v.pp[1])}</span></th>`).join('')}</tr><tr><th></th>${vs.map(() => '<th>Singular</th><th>Plural</th>').join('')}</tr></thead><tbody>${[0, 1, 2].map((r) => `<tr><th>${PL[r]} person</th>${vs.map((v, i) => [r, r + 3].map((idx) => `<td class="la">${hl(ps[i][t][idx], v, ps[i])}</td>`).join('')).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 export const TABLES = {

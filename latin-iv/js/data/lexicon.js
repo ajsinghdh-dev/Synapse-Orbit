@@ -194,7 +194,7 @@ const SMALL = [
   ['ō', 'interj', ['O', 'oh'], 2, { conf: 'core', note: 'Used with the vocative: ō patria!' }],
   ['sine', 'prep', ['without'], 2, { governs: 'abl', conf: 'core' }],
   ['dē', 'prep', ['down from', 'from', 'concerning', 'about'], 3, { governs: 'abl', conf: 'core' }],
-  ['in', 'prep', ['in', 'on'], 3, { governs: 'abl/acc', note: 'in + ablative = in, on (place where). Wheelock also teaches in + accusative = into, toward, against (motion).', conf: 'core' }],
+  ['in', 'prep', ['in', 'on'], 3, { governs: 'abl/acc', note: 'in + ablative = in, on (place where). in + accusative = into, toward, against (motion); the same word takes either case, and the case changes the meaning.', conf: 'core' }],
   ['hodiē', 'adv', ['today'], 3, { conf: 'core' }],
   ['semper', 'adv', ['always'], 3, { conf: 'core' }],
   ['nihil', 'indecl', ['nothing'], 4, { conf: 'core', note: 'Indeclinable noun.' }],

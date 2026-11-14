@@ -57,7 +57,7 @@ export default function settings({ root, store }) {
   on('#s-timer', 'change', (e) => store.setSetting('timerVisible', e.target.checked));
   root.querySelectorAll('[data-theme]').forEach((b) => b.addEventListener('click', () => { store.setSetting('theme', b.dataset.theme); applyTheme(); root.querySelectorAll('[data-theme]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
   root.querySelectorAll('[data-mac]').forEach((b) => b.addEventListener('click', () => { store.setSetting('macronMode', b.dataset.mac); root.querySelectorAll('[data-mac]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
-  on('#exp', 'click', () => download(`latin-iv-backup-${new Date(store.now()).toISOString().slice(0, 10)}.json`, store.export()));
+  on('#exp', 'click', async () => { const r = await download(`latin-iv-backup-${new Date(store.now()).toISOString().slice(0, 10)}.json`, store.export()); toast(r === 'saved' ? 'Backup ready' : 'Backup not saved'); });
   on('#imp', 'change', async (e) => { const f = e.target.files[0]; if (!f) return; try { store.import(await f.text()); applyTheme(); toast('Backup restored'); location.hash = '#/dashboard'; } catch (err) { toast(err.message); } });
   on('#reset', 'click', async () => { if (await confirmDialog({ title: 'Reset all progress?', body: 'This permanently deletes your attempts, spaced-repetition schedule, mistake bank and mock results on this device. Export a backup first if unsure.', ok: 'Delete everything', danger: true })) { store.reset(); toast('Progress reset'); location.hash = '#/dashboard'; } });
   return () => cloud.subs.delete(paint);

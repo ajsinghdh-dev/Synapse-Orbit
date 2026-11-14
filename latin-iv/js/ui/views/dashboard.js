@@ -49,7 +49,7 @@ export default function dashboard({ root, store, now, activeIds }) {
 
       <div class="hero">
         <section class="card gold" aria-labelledby="cd-h">
-          <div class="card-head"><h3 id="cd-h">Exam countdown</h3><button class="btn quiet sm" id="edit-exam">Edit time</button></div>
+          <div class="card-head"><h3 id="cd-h">Exam countdown</h3><button class="btn ${cd.done ? 'primary' : 'quiet'} sm" id="edit-exam">${cd.done ? 'Set exam date' : 'Edit time'}</button></div>
           ${cd.done ? '<p class="display" style="font-size:24px">The exam date you set has passed. Set the next one and the countdown returns.</p>' : `
           <div class="count" aria-live="off"><span><span class="n">${cd.d}</span> <span class="u">days</span></span><span><span class="n">${String(cd.h).padStart(2, '0')}</span> <span class="u">hrs</span></span><span><span class="n">${String(cd.m).padStart(2, '0')}</span> <span class="u">min</span></span></div>
           <p class="mb0"><strong>${plural(cd.studyDays, 'study day')}</strong> left, counting today. <span class="muted">Exam: ${esc(exStr)} (${esc(tz)}).</span></p>`}

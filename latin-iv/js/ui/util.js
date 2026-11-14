@@ -96,8 +96,11 @@ export function initMacronBar() {
 }
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-export function download(name, text, type = 'application/json') {
+export async function download(name, text, type = 'application/json') {
+  // inside Claude the page may not trigger downloads itself: ask the host to save the file (the viewer confirms)
+  try { const c = globalThis.claude && globalThis.claude.use ? await globalThis.claude.use('downloads') : null; if (c) { await c.save({ filename: name, data: text }); return 'saved'; } } catch (e) { return 'declined'; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  return 'saved';
 }
 export function fmtDur(ms) { const s = Math.max(0, Math.round(ms / 1000)); const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, '0')}`; }
 export function ago(t, now) { const d = Math.round((now - t) / 60000); if (d < 1) return 'just now'; if (d < 60) return d + ' min ago'; if (d < 1440) return Math.round(d / 60) + ' h ago'; return Math.round(d / 1440) + ' d ago'; }
