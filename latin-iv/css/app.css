@@ -356,3 +356,106 @@ a { color: var(--blue-edge); font-weight: 700; } :root[data-theme="dark"] a { co
 .routine li a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 14px; color: var(--ink-2); text-decoration: none; font-weight: 700; }
 .routine li a:hover { border-color: #84D8FF; background: var(--blue-soft); }
 .routine strong { color: var(--ink); font-weight: 900; }
+
+/* =====================================================================
+   GREEK THEME (inspired by the Greek feel of Hermes; not a copy of it)
+   Marble ground · Aegean blue · olive · terracotta · Cinzel inscriptions
+   ===================================================================== */
+:root {
+  --font-ui: 'Nunito', system-ui, sans-serif;
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-la: 'EB Garamond', 'Iowan Old Style', Georgia, serif;
+  --marble: #F7F3EA; --marble-2: #EFE8D9; --aegean: #1F5F8B; --aegean-2: #2D7DB3; --aegean-soft: #E4EEF5;
+  --olive: #6B7A3A; --terracotta: #B5573B; --clay-soft: #F4E3D6; --gold2: #B8893A;
+  --bg: var(--marble); --bg-2: var(--marble-2); --surface: #FFFDF8; --surface-2: var(--marble-2);
+  --line: #D9CFBA; --line-2: #CBBFA5; --ink: #22272E; --ink-2: #3F4650; --ink-3: #6B6A63;
+  --green: var(--olive); --green-edge: #515E26; --blue: var(--aegean); --blue-edge: #164A6B; --blue-soft: var(--aegean-soft);
+  --accent: var(--aegean); --accent-ink: #FFFDF8; --accent-soft: var(--aegean-soft);
+  --gold: var(--gold2); --gold-ink: #7A5A1E; --gold-soft: #F3E7CC;
+  --ok: #4D6B2A; --ok-bg: #E6EDD6; --bad: #A23E28; --bad-bg: #F5DDD3; --warn: #7A5A1E; --warn-bg: #F3E7CC;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] {
+  --bg: #161B22; --bg-2: #11151B; --surface: #1D242D; --surface-2: #232B36; --line: #354050; --line-2: #3F4A5B;
+  --ink: #EFE9DC; --ink-2: #D2CBBC; --ink-3: #9C978A; --aegean: #7FB6DA; --aegean-2: #9CCBE8; --aegean-soft: #1B3142; --accent-soft: #1B3142; --blue-soft: #1B3142;
+  --blue: #7FB6DA; --blue-edge: #4E86AD; --olive: #A5B56A; --green: #A5B56A; --green-edge: #7E8E45; --terracotta: #D8866A;
+  --gold-ink: #E2BE7A; --gold-soft: #322A18; --ok: #A5C77A; --ok-bg: #1F2A18; --bad: #E79379; --bad-bg: #351F19; --warn: #E2BE7A; --warn-bg: #322A18; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #161B22; --bg-2: #11151B; --surface: #1D242D; --surface-2: #232B36; --line: #354050; --line-2: #3F4A5B;
+  --ink: #EFE9DC; --ink-2: #D2CBBC; --ink-3: #9C978A; --aegean: #7FB6DA; --aegean-2: #9CCBE8; --aegean-soft: #1B3142; --accent-soft: #1B3142; --blue-soft: #1B3142;
+  --blue: #7FB6DA; --blue-edge: #4E86AD; --olive: #A5B56A; --green: #A5B56A; --green-edge: #7E8E45; --terracotta: #D8866A;
+  --gold-ink: #E2BE7A; --gold-soft: #322A18; --ok: #A5C77A; --ok-bg: #1F2A18; --bad: #E79379; --bad-bg: #351F19; --warn: #E2BE7A; --warn-bg: #322A18; color-scheme: dark; }
+
+body { background: var(--marble); }
+/* Greek key (meander) band across the top of the app */
+.topbar, .sidebar::before {
+  background-color: var(--marble);
+}
+.topbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -7px; height: 7px; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='7' viewBox='0 0 28 7'%3E%3Cpath d='M0 6V1h2v4h2V3h2v2h2V1h2' fill='none' stroke='%231F5F8B' stroke-width='1' /%3E%3C/svg%3E");
+  background-repeat: repeat-x; opacity: .7; }
+.sidebar { background: var(--marble-2); border-right: 1px solid var(--line); }
+.brand b { font-family: var(--font-display); font-weight: 700; letter-spacing: .12em; color: var(--aegean); font-size: 26px; }
+.brand b i { color: var(--gold2); font-style: normal; }
+.brand span { font-family: var(--font-la); font-style: italic; font-size: 14px; color: var(--ink-3); font-weight: 400; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: .02em; color: var(--ink); }
+h1 { font-size: clamp(26px, 3.4vw, 34px); } h2 { font-size: 22px; } h3 { font-size: 17px; text-transform: uppercase; letter-spacing: .08em; }
+.inscr, .caps { font-family: var(--font-display); letter-spacing: .18em; font-weight: 600; font-size: 11px; color: var(--gold-ink); }
+.motto { font-family: var(--font-la); font-style: italic; color: var(--gold-ink); }
+.nav a { font-family: var(--font-display); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; border-radius: 4px; border: 1px solid transparent; }
+.nav a:hover { background: var(--aegean-soft); color: var(--aegean); }
+.nav a[aria-current="page"] { background: var(--aegean); color: var(--marble); border-color: var(--aegean); }
+.nav a[aria-current="page"] svg { color: var(--gold2); }
+/* cards: marble panels with a thin olive-gold frame, like a plaque */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 1px 0 rgba(120,100,60,.08); }
+.card::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(184,137,58,.22); border-radius: 3px; pointer-events: none; }
+.card.gold { background: linear-gradient(180deg, var(--gold-soft), transparent 60%), var(--surface); border-color: #CDB27A; }
+.hello { background: var(--aegean-soft); border: 1px solid #B9D2E3; border-radius: 6px; }
+.hello h2 { color: var(--aegean); }
+.hello .inscr { color: var(--gold-ink); }
+/* buttons: stone-cut, flat, Aegean and olive */
+.btn { border-radius: 4px; font-family: var(--font-display); letter-spacing: .1em; font-weight: 600; text-transform: uppercase; font-size: 12px; border: 1px solid var(--line-2); border-bottom-width: 3px; color: var(--aegean); background: var(--surface); }
+.btn.primary { background: var(--aegean); color: var(--marble); border-color: var(--blue-edge); }
+.btn.gold { background: var(--gold2); color: #1B1A16; border-color: #8C6A2A; }
+.btn.quiet { color: var(--aegean); }
+.chip, .chip[aria-pressed="true"] { border-radius: 4px; font-family: var(--font-display); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.chip[aria-pressed="true"], .chip.on { background: var(--aegean); color: var(--marble); border-color: var(--blue-edge); }
+.badge { border-radius: 3px; font-family: var(--font-display); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.badge.gold { background: var(--gold-soft); color: var(--gold-ink); }
+.input, select.input, textarea.input { border-radius: 4px; background: var(--surface); border: 1px solid var(--line-2); font-weight: 500; }
+.input:focus { border-color: var(--aegean); box-shadow: 0 0 0 3px var(--aegean-soft); }
+.opt { border-radius: 4px; border-bottom-width: 3px; border-color: var(--line-2); font-weight: 500; }
+.opt[aria-checked="true"] { border-color: var(--aegean); background: var(--aegean-soft); color: var(--aegean); }
+.opt.ok { border-color: var(--olive); background: var(--ok-bg); color: var(--ok); }
+.opt.bad { border-color: var(--terracotta); background: var(--bad-bg); color: var(--bad); }
+.progress { background: var(--line); border-radius: 2px; height: 8px; } .progress > i { background: var(--aegean); border-radius: 2px; } .progress > i::after { display: none; }
+.meter .bar i, .barrow .bar i { background: var(--aegean); border-radius: 2px; } .barrow .bar i.hi { background: var(--olive); } .barrow .bar i.low { background: var(--terracotta); }
+.ring .fg { stroke: var(--aegean); } .ring text { font-family: var(--font-display); }
+.count .n, .stat b, .ch-card .pct { font-family: var(--font-display); font-weight: 600; }
+.count .u { font-family: var(--font-display); letter-spacing: .14em; }
+/* chapter identities: amphora colours */
+.c1 { background: var(--aegean); } .c2 { background: var(--terracotta); } .c3 { background: var(--olive); } .c4 { background: var(--gold2); } .c5 { background: #7A4E7C; } .c6 { background: #3F7F78; }
+.ch-ico { border-radius: 4px; border-bottom-width: 3px; font-family: var(--font-display); }
+.routine li a { border-radius: 4px; border-bottom-width: 3px; border-color: var(--line-2); }
+.routine li a:hover { border-color: var(--aegean); background: var(--aegean-soft); }
+.routine strong { font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; font-size: 12px; color: var(--aegean); }
+.banner.ok { background: var(--ok-bg); color: var(--ok); }
+.tabs a[aria-current="page"], .tabs [aria-selected="true"] { color: var(--aegean); border-bottom-color: var(--gold2); }
+.tabs a, .tabs button { font-family: var(--font-display); letter-spacing: .1em; }
+.tabbar { background: var(--marble); border-top: 1px solid var(--line); }
+.tabbar [aria-current="page"] { color: var(--aegean); } .tabbar [aria-current="page"] svg { color: var(--aegean); }
+.topbar { background: var(--marble); border-bottom: 1px solid var(--line); }
+.topbar .brand b { font-size: 22px; }
+.mascot { filter: saturate(.92); }
+.la { font-family: var(--font-la); font-weight: 500; font-size: 1.12em; }
+.latin-big, .qprompt .la { font-family: var(--font-la); font-weight: 500; }
+.qprompt { font-family: var(--font-la); font-size: 21px; font-weight: 500; }
+.node .disc { border-radius: 50%; }
+.node.open .disc { background: var(--aegean); border-bottom-color: var(--blue-edge); }
+.node.done .disc { background: var(--gold2); border-bottom-color: #8C6A2A; }
+.unit.today, .unit.future { background: var(--aegean); border-bottom-color: var(--blue-edge); border-radius: 4px; }
+.unit.past { background: #9C9782; border-bottom-color: #7A7663; }
+.unit h3 { color: var(--marble); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .06em; font-size: 16px; }
+.bubble { border-radius: 4px; font-family: var(--font-display); letter-spacing: .08em; color: var(--aegean); }
+.say-b { border-radius: 4px; }
+.say-b .la { color: var(--aegean); }
