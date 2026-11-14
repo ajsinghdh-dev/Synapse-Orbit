@@ -351,3 +351,8 @@ a { color: var(--blue-edge); font-weight: 700; } :root[data-theme="dark"] a { co
 .btn.primary:hover { filter: brightness(1.05); }
 ::selection { background: #CDEEFF; }
 .c5 { background: var(--red); } .c6 { background: #2BB5A8; }
+/* ---------- today's routine ---------- */
+.routine { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); counter-reset: r; }
+.routine li a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 14px; color: var(--ink-2); text-decoration: none; font-weight: 700; }
+.routine li a:hover { border-color: #84D8FF; background: var(--blue-soft); }
+.routine strong { color: var(--ink); font-weight: 900; }

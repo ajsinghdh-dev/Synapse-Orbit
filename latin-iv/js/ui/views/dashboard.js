@@ -1,4 +1,4 @@
-import { readiness, chapterStats, mission, streak, todayCount, dueCounts, weakest, mostImproved, openMistakes, READINESS_WEIGHTS } from '../../core/analytics.js';
+import { readiness, chapterStats, mission, streak, todayCount, dueCounts, weakest, mostImproved, openMistakes, READINESS_WEIGHTS, localDay } from '../../core/analytics.js';
 import { CHAPTERS } from '../../data/lexicon.js';
 import { TOPICS } from '../../data/curriculum.js';
 import { Q_BY_ID } from '../../core/questions.js';
@@ -66,6 +66,16 @@ export default function dashboard({ root, store, now, activeIds }) {
         <div><div class="caps">Today’s mission${ms.primary.minutes ? ' · about ' + ms.primary.minutes + ' min' : ''}</div><h2 id="ms-h" class="mt1">${esc(ms.primary.title)}</h2><p class="mt1 mb0" style="color:var(--ink-2);max-width:60ch">${esc(ms.primary.why)}</p>
           ${ms.alts.length ? `<div class="small muted mt2">Or: ${ms.alts.map((a) => `<a href="${a.href}">${esc(a.title)}</a>`).join(' · ')}</div>` : ''}</div>
         <a class="btn primary lg" href="${ms.primary.href}">${esc(ms.primary.label || 'Start')} ${icon('arrow')}</a></div></section>
+
+      <section class="card mt2" aria-labelledby="rt-h"><div class="card-head"><h3 id="rt-h">Today’s routine</h3><span class="small muted">about 45 min · the research order</span></div>
+        <ol class="routine">
+          <li><a href="#/vocabulary/practice?mode=srs&ch=all"><strong>1 · Recall</strong> Review the words due today. Cover the English and produce the Latin. <span class="muted">${dc.due} due</span></a></li>
+          <li><a href="#/grammar/declension"><strong>2 · Produce</strong> Write one paradigm from memory, with no notes. Check it and write it again.</a></li>
+          <li><a href="#/translation?dir=la&lvl=2&day=${localDay(t)}"><strong>3 · Translate</strong> Today’s unseen passage: read it, then type your English before looking at help.</a></li>
+          <li><a href="#/mistakes"><strong>4 · Repair</strong> Re-attempt yesterday’s and open mistakes. <span class="muted">${openMistakes(st).length} open</span></a></li>
+        </ol>
+        <p class="tiny muted mt2 mb0">Passive review (rereading notes or lists) feels productive but builds little memory. Producing answers from memory is what the exam tests.</p>
+      </section>
 
       ${(resumeMock || resumePrac) ? `<section class="card mt2 soft"><div class="row between"><div><strong>Resume previous session</strong><div class="small muted">${resumeMock ? `Mock exam (${esc(resumeMock.fmt)}) — ${Object.keys(resumeMock.answers || {}).length} of ${resumeMock.ids.length} answered` : `Practice — question ${resumePrac.idx + 1} of ${resumePrac.ids.length}`}</div></div><a class="btn" href="${resumeMock ? '#/mock/run' : '#/practice/run'}">Resume ${icon('arrow')}</a></div></section>` : ''}
 
