@@ -1,15 +1,8 @@
-// LATIN IV — vocabulary database for Wheelock's Latin (7th ed.), Chapters 1–6.
+// LATIN IV — vocabulary database for Wheelock's Latin (7th ed.), Chapters 1–8.
 //
-// Rebuilt to the chapter vocabulary lists of Wheelock's Latin, 7th edition (Chapters 1–6).
-// PROVENANCE NOTE (also shown in the app, Reference ▸ Sources):
-// The UVic Wheelock pages could not be fetched when this database was built (network access to
-// hcmc.uvic.ca was blocked), so chapter assignment was written from the 7th-edition chapter
-// structure as best known. Every entry carries conf:
-//   'core'  — headword, forms and glosses are standard dictionary data AND the chapter is a
-//             confident match to the Wheelock chapter list.
-//   'check' — the Latin is correct, but the chapter placement (or an optional gloss) should be
-//             confirmed against your own textbook's vocabulary list. Use Vocabulary ▸ Browse to
-//             switch any word off; every quiz, mock and generator respects that choice.
+// Checked entry-by-entry against the chapter vocabulary pages of the official Wheelock's Latin series site
+// (wheelockslatin.com/chapters/one … eight). Words used in the practice sentences but NOT on those lists are kept
+// separately in SUPPORT: they are analysed and glossed in sentences, but never appear in Vocabulary, SRS or quizzes.
 // Principal parts: only dictionary-standard parts are stored. A fourth part of null means "not
 // tested" (typically intransitive verbs) — it is never invented.
 
@@ -40,13 +33,28 @@ const VERBS = [
   ['satiō', 'satiāre', 'satiāvī', 'satiātum', 1, ['satisfy', 'sate'], 3, 'core'],
   // Chapter 4
   ['iuvō', 'iuvāre', 'iūvī', 'iūtum', 1, ['help', 'aid', 'assist', 'please'], 4, 'core', 'Irregular perfect iūvī and supine iūtum.'],
+  ['adiuvō', 'adiuvāre', 'adiūvī', 'adiūtum', 1, ['aid', 'help', 'assist', 'please'], 4, 'core', 'A compound of iuvō: perfect adiūvī.'],
   // Chapter 5
-  ['adiuvō', 'adiuvāre', 'adiūvī', 'adiūtum', 1, ['aid', 'help', 'assist', 'encourage'], 5, 'core', 'A compound of iuvō: perfect adiūvī.'],
+  ['cēnō', 'cēnāre', 'cēnāvī', 'cēnātum', 1, ['dine'], 5, 'core'],
+  ['culpō', 'culpāre', 'culpāvī', 'culpātum', 1, ['blame', 'censure'], 5, 'core'],
   ['maneō', 'manēre', 'mānsī', 'mānsum', 2, ['remain', 'stay', 'abide', 'continue'], 5, 'core'],
   ['remaneō', 'remanēre', 'remānsī', 'remānsum', 2, ['stay behind', 'remain', 'abide', 'continue'], 5, 'core'],
   ['superō', 'superāre', 'superāvī', 'superātum', 1, ['surpass', 'overcome', 'conquer', 'be above', 'have the upper hand'], 5, 'core'],
   // Chapter 6
   ['tolerō', 'tolerāre', 'tolerāvī', 'tolerātum', 1, ['bear', 'endure'], 6, 'core'],
+  // Chapter 7
+  ['audeō', 'audēre', 'ausus sum', null, 2, ['dare'], 7, 'core', 'Semi-deponent: active forms in the present system (audeō, audēs, audet…), but the perfect is passive in form: ausus sum.'],
+  ['necō', 'necāre', 'necāvī', 'necātum', 1, ['murder', 'kill'], 7, 'core'],
+  // Chapter 8 — third conjugation: short -e- before -re (dūcere), -i- before most endings, -unt in the 3rd plural
+  ['agō', 'agere', 'ēgī', 'āctum', 3, ['drive', 'lead', 'do', 'act', 'pass', 'spend (life or time)'], 8, 'core', 'grātiās agere = to thank (lit. “to do thanks”).'],
+  ['dēmōnstrō', 'dēmōnstrāre', 'dēmōnstrāvī', 'dēmōnstrātum', 1, ['point out', 'show', 'demonstrate'], 8, 'core'],
+  ['discō', 'discere', 'didicī', null, 3, ['learn'], 8, 'core'],
+  ['doceō', 'docēre', 'docuī', 'doctum', 2, ['teach'], 8, 'core', 'A 2nd-conjugation verb (long ē), not 3rd: docēre vs. dūcere.'],
+  ['dūcō', 'dūcere', 'dūxī', 'ductum', 3, ['lead', 'consider', 'regard', 'prolong'], 8, 'core', 'The singular imperative is irregular: dūc! (not dūce). Plural: dūcite.', { impSg: 'dūc' }],
+  ['gerō', 'gerere', 'gessī', 'gestum', 3, ['carry', 'carry on', 'manage', 'conduct', 'wage', 'accomplish', 'perform'], 8, 'core'],
+  ['scrībō', 'scrībere', 'scrīpsī', 'scrīptum', 3, ['write', 'compose'], 8, 'core'],
+  ['trahō', 'trahere', 'trāxī', 'tractum', 3, ['draw', 'drag', 'derive', 'acquire'], 8, 'core'],
+  ['vincō', 'vincere', 'vīcī', 'victum', 3, ['conquer', 'overcome'], 8, 'core'],
 ];
 
 // ---- nouns: [nom, gen, gender, type, stem|null, meanings, chapter, flags]
@@ -91,22 +99,59 @@ const NOUNS = [
   ['magistra', 'magistrae', 'f', 'a', null, ['teacher (female)', 'schoolmistress', 'mistress'], 4, { anim: 1 }],
   ['mora', 'morae', 'f', 'a', null, ['delay'], 4, {}],
   ['oculus', 'oculī', 'm', 'us', null, ['eye'], 4, {}],
+  ['stultus', 'stultī', 'm', 'us', null, ['fool'], 4, { anim: 1, note: 'The adjective stultus, -a, -um used as a noun: “a fool”.' }],
   ['officium', 'officiī', 'n', 'ium', null, ['duty', 'service'], 4, {}],
   ['ōtium', 'ōtiī', 'n', 'ium', null, ['leisure', 'peace'], 4, {}],
   ['perīculum', 'perīculī', 'n', 'um', null, ['danger', 'risk'], 4, {}],
   ['remedium', 'remediī', 'n', 'ium', null, ['cure', 'remedy'], 4, {}],
   // Chapter 5
+  ['adulēscentia', 'adulēscentiae', 'f', 'a', null, ['youth', 'young manhood', 'youthfulness'], 5, {}],
+  ['animus', 'animī', 'm', 'us', null, ['soul', 'spirit', 'mind'], 5, { sgOnly: 1 }],
+  ['animī', 'animōrum', 'm', 'us', 'anim', ['high spirits', 'pride', 'courage'], 5, { plOnly: 1, note: 'Plural only in this sense: animī, animōrum.' }],
   ['caelum', 'caelī', 'n', 'um', null, ['sky', 'heaven'], 5, {}],
   ['culpa', 'culpae', 'f', 'a', null, ['fault', 'blame'], 5, {}],
   ['glōria', 'glōriae', 'f', 'a', null, ['glory', 'fame'], 5, {}],
   ['verbum', 'verbī', 'n', 'um', null, ['word'], 5, {}],
   // Chapter 6
+  ['dea', 'deae', 'f', 'a', null, ['goddess'], 6, { anim: 1, altDatAblPl: 'deābus', note: 'Dative/ablative plural deābus (to tell goddesses from gods, deīs).' }],
+  ['deus', 'deī', 'm', 'us', null, ['god'], 6, { anim: 1, deus: 1, note: 'Irregular plural: nom. dī / deī / diī, gen. deōrum or deum, dat./abl. dīs / deīs / diīs. Vocative singular = nominative: deus.' }],
+  ['discipula', 'discipulae', 'f', 'a', null, ['student', 'pupil', 'learner'], 6, { anim: 1 }],
+  ['discipulus', 'discipulī', 'm', 'us', null, ['pupil', 'learner', 'student'], 6, { anim: 1 }],
   ['īnsidiae', 'īnsidiārum', 'f', 'a', 'īnsidi', ['ambush', 'plot', 'treachery'], 6, { plOnly: 1, note: 'Plural only: īnsidiae, īnsidiārum. Translate as a singular in English (“a plot”).' }],
+  ['Graecus', 'Graecī', 'm', 'us', null, ['Greek'], 6, { anim: 1, note: 'The adjective Graecus used as a noun: “a Greek”.' }],
   ['liber', 'librī', 'm', 'er', 'libr', ['book'], 6, { note: 'The -e- drops out: librī. Do not confuse with līber, lībera, līberum (free).' }],
-  ['locus', 'locī', 'm', 'us', null, ['place', 'passage in literature'], 6, { plNeut: 1, note: 'Masculine in the singular; the plural is usually neuter: loca, -ōrum (places).' }],
-  ['morbus', 'morbī', 'm', 'us', null, ['disease', 'sickness'], 6, {}],
   ['tyrannus', 'tyrannī', 'm', 'us', null, ['absolute ruler', 'tyrant'], 6, { anim: 1 }],
-  ['vitium', 'vitiī', 'n', 'ium', null, ['vice', 'fault', 'crime'], 6, {}],
+  ['vitium', 'vitiī', 'n', 'ium', null, ['crime', 'fault', 'vice'], 6, {}],
+  // Chapter 7 — third declension: the stem comes from the GENITIVE singular (amor, amōris → amōr-)
+  ['amor', 'amōris', 'm', '3', 'amōr', ['love'], 7, {}],
+  ['carmen', 'carminis', 'n', '3n', 'carmin', ['song', 'poem'], 7, {}],
+  ['cīvitās', 'cīvitātis', 'f', '3', 'cīvitāt', ['state', 'citizenship'], 7, {}],
+  ['corpus', 'corporis', 'n', '3n', 'corpor', ['body'], 7, {}],
+  ['homō', 'hominis', 'm', '3', 'homin', ['human being', 'man'], 7, { anim: 1 }],
+  ['labor', 'labōris', 'm', '3', 'labōr', ['labor', 'work', 'toil', 'a work', 'production'], 7, {}],
+  ['littera', 'litterae', 'f', 'a', null, ['letter of the alphabet'], 7, { sgOnly: 1, note: 'Singular = a letter of the alphabet; the plural litterae has other meanings (below).' }],
+  ['litterae', 'litterārum', 'f', 'a', 'litter', ['letter', 'epistle', 'literature'], 7, { plOnly: 1, note: 'Plural only in this sense: litterae, litterārum.' }],
+  ['mōs', 'mōris', 'm', '3', 'mōr', ['habit', 'custom', 'manner'], 7, { sgOnly: 1 }],
+  ['mōrēs', 'mōrum', 'm', '3', 'mōr', ['habits', 'morals', 'character'], 7, { plOnly: 1, note: 'Plural only in this sense: mōrēs, mōrum.' }],
+  ['nōmen', 'nōminis', 'n', '3n', 'nōmin', ['name'], 7, {}],
+  ['pāx', 'pācis', 'f', '3', 'pāc', ['peace'], 7, {}],
+  ['rēgīna', 'rēgīnae', 'f', 'a', null, ['queen'], 7, { anim: 1 }],
+  ['rēx', 'rēgis', 'm', '3', 'rēg', ['king'], 7, { anim: 1 }],
+  ['tempus', 'temporis', 'n', '3n', 'tempor', ['time', 'occasion', 'opportunity'], 7, {}],
+  ['terra', 'terrae', 'f', 'a', null, ['earth', 'ground', 'land', 'country'], 7, {}],
+  ['uxor', 'uxōris', 'f', '3', 'uxōr', ['wife'], 7, { anim: 1 }],
+  ['virgō', 'virginis', 'f', '3', 'virgin', ['maiden', 'virgin'], 7, { anim: 1 }],
+  ['virtūs', 'virtūtis', 'f', '3', 'virtūt', ['manliness', 'courage', 'excellence', 'character', 'worth', 'virtue'], 7, {}],
+  // Chapter 8
+  ['cōpia', 'cōpiae', 'f', 'a', null, ['abundance', 'supply'], 8, { sgOnly: 1 }],
+  ['cōpiae', 'cōpiārum', 'f', 'a', 'cōpi', ['supplies', 'troops', 'forces'], 8, { plOnly: 1, note: 'Plural only in this sense: cōpiae, cōpiārum.' }],
+  ['frāter', 'frātris', 'm', '3', 'frātr', ['brother'], 8, { anim: 1 }],
+  ['laus', 'laudis', 'f', '3', 'laud', ['praise', 'glory', 'fame'], 8, {}],
+  ['lībertās', 'lībertātis', 'f', '3', 'lībertāt', ['liberty'], 8, {}],
+  ['ratiō', 'ratiōnis', 'f', '3', 'ratiōn', ['reckoning', 'account', 'reason', 'judgment', 'consideration', 'system', 'manner', 'method'], 8, {}],
+  ['scrīptor', 'scrīptōris', 'm', '3', 'scrīptōr', ['writer', 'author'], 8, { anim: 1 }],
+  ['soror', 'sorōris', 'f', '3', 'sorōr', ['sister'], 8, { anim: 1 }],
+  ['victōria', 'victōriae', 'f', 'a', null, ['victory'], 8, {}],
 ];
 
 // ---- adjectives: [m, f, n, type, stem|null, meanings, chapter, conf, extra]
@@ -131,57 +176,75 @@ const ADJS = [
   ['noster', 'nostra', 'nostrum', 'er1', 'nostr', ['our', 'ours'], 5, 'core', { note: 'Drops its -e-: noster, nostra, nostrum.' }],
   ['pulcher', 'pulchra', 'pulchrum', 'er1', 'pulchr', ['beautiful', 'handsome', 'fine'], 5, 'core', { note: 'Drops its -e-: pulcher, pulchra, pulchrum.' }],
   ['sānus', 'sāna', 'sānum', 'us', null, ['sound', 'healthy', 'sane'], 5, 'core'],
-  ['vester', 'vestra', 'vestrum', 'er1', 'vestr', ['your (pl.)', 'yours'], 5, 'core', { note: '“your” when more than one person is addressed. Drops its -e-.' }],
   // Chapter 6
   ['Graecus', 'Graeca', 'Graecum', 'us', null, ['Greek'], 6, 'core'],
   ['perpetuus', 'perpetua', 'perpetuum', 'us', null, ['perpetual', 'lasting', 'uninterrupted', 'continuous'], 6, 'core'],
   ['plēnus', 'plēna', 'plēnum', 'us', null, ['full', 'abundant', 'generous'], 6, 'core'],
   ['salvus', 'salva', 'salvum', 'us', null, ['safe', 'sound'], 6, 'core'],
   ['secundus', 'secunda', 'secundum', 'us', null, ['second', 'favorable'], 6, 'core'],
+  ['vester', 'vestra', 'vestrum', 'er1', 'vestr', ['your (pl.)', 'yours'], 6, 'core', { note: '“your” when more than one person is addressed. Drops its -e-.' }],
+  // Chapter 7
+  ['novus', 'nova', 'novum', 'us', null, ['new', 'strange'], 7, 'core'],
 ];
 
 // ---- other words: [la, pos, meanings, chapter, extra]
 const SMALL = [
-  ['nihil', 'indecl', ['nothing'], 1, { conf: 'core', note: 'Indeclinable noun.' }],
-  ['nōn', 'adv', ['not'], 1, { conf: 'core' }],
-  ['quid', 'pron', ['what'], 1, { conf: 'core' }],
-  ['saepe', 'adv', ['often'], 1, { conf: 'core' }],
-  ['sī', 'conj', ['if'], 1, { conf: 'core' }],
   ['et', 'conj', ['and', 'even'], 2, { conf: 'core', note: 'et … et = both … and' }],
   ['sed', 'conj', ['but'], 2, { conf: 'core' }],
   ['ō', 'interj', ['O', 'oh'], 2, { conf: 'core', note: 'Used with the vocative: ō patria!' }],
   ['sine', 'prep', ['without'], 2, { governs: 'abl', conf: 'core' }],
   ['dē', 'prep', ['down from', 'from', 'concerning', 'about'], 3, { governs: 'abl', conf: 'core' }],
-  ['in', 'prep', ['in', 'on', 'into', 'toward', 'against'], 3, { governs: 'abl/acc', note: 'in + ablative = in, on (place where). in + accusative = into, toward, against (motion).', conf: 'core' }],
-  ['interim', 'adv', ['meanwhile'], 3, { conf: 'core' }],
-  ['tum', 'adv', ['then', 'at that time', 'thereupon'], 3, { conf: 'core' }],
+  ['in', 'prep', ['in', 'on'], 3, { governs: 'abl/acc', note: 'in + ablative = in, on (place where). Wheelock also teaches in + accusative = into, toward, against (motion).', conf: 'core' }],
+  ['hodiē', 'adv', ['today'], 3, { conf: 'core' }],
+  ['semper', 'adv', ['always'], 3, { conf: 'core' }],
+  ['nihil', 'indecl', ['nothing'], 4, { conf: 'core', note: 'Indeclinable noun.' }],
   // Chapter 5
-  ['crās', 'adv', ['tomorrow'], 5, { conf: 'core' }],
-  ['herī', 'adv', ['yesterday'], 5, { conf: 'core' }],
+  ['tē', 'pron', ['you', 'yourself'], 5, { conf: 'core', note: 'Accusative/ablative singular of tū. amābō tē = please.' }],
   ['igitur', 'adv', ['therefore', 'consequently'], 5, { conf: 'core', note: 'Postpositive: usually the second word in its clause.' }],
   ['-ne', 'particle', ['(asks a yes/no question)'], 5, { conf: 'core', note: 'Enclitic added to the first word: valēsne? “are you well?”' }],
   ['propter', 'prep', ['on account of', 'because of'], 5, { governs: 'acc', conf: 'core' }],
-  ['quandō', 'adv', ['when'], 5, { conf: 'core', note: 'Interrogative and conjunction.' }],
+  ['crās', 'adv', ['tomorrow'], 5, { conf: 'core' }],
+  ['herī', 'adv', ['yesterday'], 5, { conf: 'core' }],
+  ['quandō', 'adv', ['when'], 5, { conf: 'core', note: 'sī quandō = if ever.' }],
   ['satis', 'indecl', ['enough', 'sufficient', 'sufficiently'], 5, { conf: 'core', note: 'Indeclinable noun, adjective or adverb.' }],
+  ['tum', 'adv', ['then', 'at that time', 'thereupon', 'in the next place'], 5, { conf: 'core' }],
   // Chapter 6
-  ['Cicerō', 'propn', ['Cicero'], 6, { conf: 'core', note: 'Cicerō, Cicerōnis, m. (Marcus Tullius Cicero). Third declension, which is taught in Chapter 7: not drilled here.' }],
   ['-que', 'conj', ['and (enclitic)'], 6, { conf: 'core', note: 'Enclitic: attached to the second word: puerī puellaeque “boys and girls”.' }],
   ['ibi', 'adv', ['there'], 6, { conf: 'core' }],
   ['nunc', 'adv', ['now', 'at present'], 6, { conf: 'core' }],
   ['quārē', 'adv', ['why', 'wherefore', 'therefore'], 6, { conf: 'core', note: 'Literally “because of which thing”.' }],
   ['ubi', 'adv', ['where', 'when'], 6, { conf: 'core' }],
+  // Chapter 7
+  ['post', 'prep', ['after', 'behind'], 7, { governs: 'acc', conf: 'core' }],
+  ['sub', 'prep', ['under', 'up under', 'close to', 'at the foot of'], 7, { governs: 'abl/acc', note: 'sub + ablative with verbs of rest; sub + accusative with verbs of motion (down to, into).', conf: 'core' }],
+  // Chapter 8
+  ['Cicerō', 'propn', ['Cicero'], 8, { conf: 'core', note: 'Cicerō, Cicerōnis, m.: Marcus Tullius Cicero. A third-declension name.' }],
+  ['dum', 'conj', ['while', 'as long as', 'at the same time that', 'until'], 8, { conf: 'core', note: 'With the subjunctive, “until”.' }],
+  ['ad', 'prep', ['to', 'up to', 'near to'], 8, { governs: 'acc', conf: 'core' }],
+  ['ex', 'prep', ['out of', 'from', 'from within', 'by reason of', 'on account of'], 8, { governs: 'abl', forms: ['ē'], note: 'ex before a vowel or consonant; ē only before a consonant.', conf: 'core' }],
+  ['numquam', 'adv', ['never'], 8, { conf: 'core' }],
+  ['tamen', 'adv', ['nevertheless', 'still'], 8, { conf: 'core' }],
+];
+
+// Words the practice sentences use that are NOT on Wheelock's chapter lists. Analysed and glossed in sentences only.
+const SUPPORT_SMALL = [
+  ['nōn', 'adv', ['not']], ['quid', 'pron', ['what']], ['saepe', 'adv', ['often']], ['sī', 'conj', ['if']], ['interim', 'adv', ['meanwhile']],
+];
+const SUPPORT_NOUNS = [
+  ['locus', 'locī', 'm', 'us', null, ['place'], { plNeut: 1, note: 'Masculine in the singular; the plural is usually neuter: loca, -ōrum (places).' }],
+  ['morbus', 'morbī', 'm', 'us', null, ['disease', 'sickness'], {}],
 ];
 
 const lex = [];
 const taken = new Set();
 const uid = (la, pos) => { let id = mkId(la); if (taken.has(id)) id += '_' + pos; taken.add(id); return id; };   // liber (book) vs līber (free)
-for (const [la, inf, perf, p4, conj, en, ch, conf, note] of VERBS) {
-  lex.push({ id: uid(la, 'verb'), la, pos: 'verb', conj, pp: [la, inf, perf, p4], en, ch, conf, note: note || '', irreg: la === 'dō' ? 'do' : undefined });
+for (const [la, inf, perf, p4, conj, en, ch, conf, note, x = {}] of VERBS) {
+  lex.push({ id: uid(la, 'verb'), la, pos: 'verb', conj, pp: [la, inf, perf, p4], en, ch, conf, note: note || '', irreg: la === 'dō' ? 'do' : undefined, impSg: x.impSg });
 }
 lex.push({ id: 'sum', la: 'sum', pos: 'verb', conj: 0, irreg: 'sum', pp: ['sum', 'esse', 'fuī', 'futūrum'], en: ['be', 'exist'], ch: 4, conf: 'core', note: 'Irregular. sum, es, est, sumus, estis, sunt. It links a subject to a predicate nominative or predicate adjective.' });
 lex.push({ id: 'possum', la: 'possum', pos: 'verb', conj: 0, irreg: 'possum', pp: ['possum', 'posse', 'potuī', null], en: ['be able', 'can', 'could', 'have power'], ch: 6, conf: 'core', note: 'pot- + sum: pot- before a vowel (potes, poteram), pos- before s (possum, possunt). Takes a complementary infinitive.' });
 for (const [la, gen, gender, type, stem, en, ch, o] of NOUNS) {
-  lex.push({ id: uid(la, 'noun'), la, pos: 'noun', decl: type === 'a' ? 1 : 2, type, stem, gender, gen, en, ch, conf: o.conf || 'core', anim: !!o.anim, contractGen: !!o.contractGen, altDatAblPl: o.altDatAblPl, plOnly: !!o.plOnly, plNeut: !!o.plNeut, note: o.note || '', genAlt: [] });
+  lex.push({ id: uid(la, 'noun'), la, pos: 'noun', decl: type === 'a' ? 1 : type === '3' || type === '3n' ? 3 : 2, type, stem, gender, gen, en, ch, conf: o.conf || 'core', anim: !!o.anim, contractGen: !!o.contractGen, altDatAblPl: o.altDatAblPl, plOnly: !!o.plOnly, sgOnly: !!o.sgOnly, plNeut: !!o.plNeut, deus: !!o.deus, note: o.note || '', genAlt: [] });
 }
 for (const [m, f, n, t, stem, en, ch, conf, x = {}] of ADJS) {
   lex.push({ id: uid(m, 'adj'), la: m, f, n, pos: 'adj', adjType: t, stem, decl: '1/2', en, ch, conf, vocM: x.vocM, plOnly: !!x.plOnly, note: x.note || '' });
@@ -191,7 +254,11 @@ for (const [la, pos, en, ch, o] of SMALL) {
 }
 
 export const LEXICON = lex;
-export const BY_ID = Object.fromEntries(lex.map((w) => [w.id, w]));
+// support words: analysed in sentences, never listed as vocabulary
+export const SUPPORT = [];
+for (const [la, pos, en] of SUPPORT_SMALL) SUPPORT.push({ id: uid(la, pos), la, pos, en, ch: 1, conf: 'core', support: true, note: '' });
+for (const [la, gen, gender, type, stem, en, o] of SUPPORT_NOUNS) SUPPORT.push({ id: uid(la, 'noun'), la, pos: 'noun', decl: 2, type, stem, gender, gen, en, ch: 1, conf: 'core', anim: false, plNeut: !!o.plNeut, note: o.note || '', support: true, genAlt: [] });
+export const BY_ID = Object.fromEntries([...lex, ...SUPPORT].map((w) => [w.id, w]));
 export const POS_LABEL = { verb: 'verb', noun: 'noun', adj: 'adjective', prep: 'preposition', conj: 'conjunction', adv: 'adverb', interj: 'interjection', pron: 'pronoun', indecl: 'indeclinable', particle: 'particle', propn: 'proper name' };
 
 export const CHAPTERS = [
@@ -201,6 +268,8 @@ export const CHAPTERS = [
   { n: 4, title: 'Second Declension Neuter & Sum', short: 'Neuter & Sum', unit: 'https://hcmc.uvic.ca/project/latin/wheelock/unit04/index.htm' },
   { n: 5, title: 'Future & Imperfect; Adjectives in -er', short: 'Future & Imperfect', unit: 'https://hcmc.uvic.ca/project/latin/wheelock/unit05/index.htm' },
   { n: 6, title: 'Sum & Possum; Complementary Infinitive', short: 'Sum & Possum', unit: 'https://hcmc.uvic.ca/project/latin/wheelock/unit06/index.htm' },
+  { n: 7, title: 'Third Declension Nouns', short: '3rd Declension', unit: 'https://hcmc.uvic.ca/project/latin/wheelock/unit07/index.htm' },
+  { n: 8, title: 'Third Conjugation Verbs', short: '3rd Conjugation', unit: 'https://hcmc.uvic.ca/project/latin/wheelock/unit08/index.htm' },
 ];
 export const CH_LIST = CHAPTERS.map((c) => c.n);
 export const UVIC_CONTENTS = 'https://hcmc.uvic.ca/project/latin/wheelock/contents.htm';

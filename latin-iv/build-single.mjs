@@ -6,7 +6,7 @@ const js = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 const css = readFileSync('css/app.css', 'utf8');
 const html = `<title>LATIN IV</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Wheelock's Latin Chapters 1–6 exam preparation.">
+<meta name="description" content="Wheelock's Latin Chapters 1–8 exam preparation.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>${css}</style>
 <div id="app" class="app"><aside class="sidebar" id="sidebar"></aside><header class="topbar" id="topbar"></header><main class="main" id="main" tabindex="-1"></main><nav class="tabbar" id="tabbar"></nav></div>

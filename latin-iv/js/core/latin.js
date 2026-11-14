@@ -1,4 +1,4 @@
-// LATIN IV — morphology engine for Wheelock's Latin Chapters 1–6.
+// LATIN IV — morphology engine for Wheelock's Latin Chapters 1–8.
 // Pure functions only (no DOM, no storage) so it can be unit-tested in Node.
 
 export const CASES = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
@@ -26,13 +26,17 @@ const ENDINGS = {
   us: { sg: ['us', 'ī', 'ō', 'um', 'ō', 'e'], pl: ['ī', 'ōrum', 'īs', 'ōs', 'īs', 'ī'] },
   er: { sg: [null, 'ī', 'ō', 'um', 'ō', null], pl: ['ī', 'ōrum', 'īs', 'ōs', 'īs', 'ī'] },
   um: { sg: ['um', 'ī', 'ō', 'um', 'ō', 'um'], pl: ['a', 'ōrum', 'īs', 'a', 'īs', 'a'] },
+  // third declension (consonant stems, Ch 7): the nominative is irregular, the stem comes from the genitive
+  '3': { sg: [null, 'is', 'ī', 'em', 'e', null], pl: ['ēs', 'um', 'ibus', 'ēs', 'ibus', 'ēs'] },
+  '3n': { sg: [null, 'is', 'ī', null, 'e', null], pl: ['a', 'um', 'ibus', 'a', 'ibus', 'a'] },
 };
 
 /** Declension-type of a noun lexeme: 'a' | 'us' | 'ius' | 'er' | 'um' | 'ium'. */
 function nounShape(lex) {
   switch (lex.type) {
     case 'a': return { end: ENDINGS.a, base: lex.stem || lex.la.slice(0, -1) };
-    case 'us': return { end: ENDINGS.us, base: lex.la.slice(0, -2) };
+    case 'us': return { end: ENDINGS.us, base: lex.stem || lex.la.slice(0, -2) };
+    case '3': case '3n': return { end: ENDINGS[lex.type], base: lex.stem };
     case 'ius': return { end: ENDINGS.us, base: lex.la.slice(0, -2) };
     case 'er': return { end: ENDINGS.er, base: lex.stem };
     case 'um': return { end: ENDINGS.um, base: lex.la.slice(0, -2) };
@@ -65,6 +69,10 @@ function declineWith(lex, shape, nomForm) {
 
 export function declineNoun(lex) {
   const d = declineWith(lex, nounShape(lex), lex.la);
+  if (lex.deus) {   // deus: vocative = nominative; plural dī/deī/diī, deōrum/deum, dīs/deīs/diīs
+    d.sg.voc = ['deus'];
+    d.pl.nom = ['deī', 'dī', 'diī']; d.pl.gen = ['deōrum', 'deum']; d.pl.dat = ['deīs', 'dīs', 'diīs']; d.pl.acc = ['deōs']; d.pl.abl = ['deīs', 'dīs', 'diīs']; d.pl.voc = ['deī', 'dī', 'diī'];
+  }
   if (lex.plNeut) { const base = lex.la.slice(0, -2); CASES.forEach((c, i) => { d.pl[c] = [base + ENDINGS.um.pl[i]]; }); }   // locus, -ī, m.; pl. loca, -ōrum, n.
   return d;
 }
@@ -106,7 +114,9 @@ const POSSUM = { ind: ['possum', 'potes', 'potest', 'possumus', 'potestis', 'pos
 const IMPF = ['bam', 'bās', 'bat', 'bāmus', 'bātis', 'bant'];
 const FUT = ['bō', 'bis', 'bit', 'bimus', 'bitis', 'bunt'];
 
-/** Present, imperfect and future active of a 1st/2nd conjugation verb (and dō, sum, possum). `ind` is the present. */
+const FUT3 = ['am', 'ēs', 'et', 'ēmus', 'ētis', 'ent'];
+/** Present, imperfect and future active of a verb of the 1st–3rd conjugation (and dō, sum, possum). `ind` is the present.
+ *  The imperfect of the 3rd conjugation is not taught before Chapter 9, so `impf` is null there. */
 export function conjugate(lex) {
   if (lex.irreg === 'sum') return { ...SUM, impSg: null, impPl: null, base: null, stem: null };
   if (lex.irreg === 'possum') return { ...POSSUM, impSg: null, impPl: null, base: null, stem: null };
@@ -119,10 +129,16 @@ export function conjugate(lex) {
   }
   if (lex.conj === 1) return { ind: [base + 'ō', base + 'ās', base + 'at', base + 'āmus', base + 'ātis', base + 'ant'], inf, impSg: base + 'ā', impPl: base + 'āte', base, stem: base + 'ā', ...tenses(base + 'ā') };
   if (lex.conj === 2) return { ind: [base + 'eō', base + 'ēs', base + 'et', base + 'ēmus', base + 'ētis', base + 'ent'], inf, impSg: base + 'ē', impPl: base + 'ēte', base, stem: base + 'ē', ...tenses(base + 'ē') };
+  if (lex.conj === 3) {
+    // third conjugation: short stem vowel -e- (dūcere); -i- before most endings, -unt, and -ā-/-ē- in the future
+    return { ind: [base + 'ō', base + 'is', base + 'it', base + 'imus', base + 'itis', base + 'unt'], inf, impSg: lex.impSg || base + 'e', impPl: base + 'ite', base, stem: base + 'e', impf: null, fut: FUT3.map((e) => base + e) };
+  }
   throw new Error('unsupported conjugation for ' + lex.la);
 }
 /** Forms of one tense: 'pres' | 'impf' | 'fut'. */
 export const tenseForms = (lex, t) => { const p = conjugate(lex); return t === 'pres' ? p.ind : p[t]; };
+/** Tenses taught for this verb (the 3rd conjugation has no imperfect before Ch 9). */
+export const tensesOf = (lex) => (lex.conj === 3 ? ['pres', 'fut'] : ['pres', 'impf', 'fut']);
 export function verbEnding(lex, idx) {
   const p = conjugate(lex);
   if (lex.irreg) return '';
@@ -153,8 +169,8 @@ export function buildAnalyzer(lexicon) {
     if (lex.pos === 'verb') {
       const p = conjugate(lex);
       p.ind.forEach((f, i) => add(f, { ...base, mood: 'ind', tense: 'pres', voice: 'act', person: PERSONS[i][0], number: PERSONS[i][1] }));
-      const tch = Math.max(lex.ch, lex.irreg === 'sum' || lex.irreg === 'possum' ? 6 : 5);   // imperfect & future: Ch 5 (sum, possum: Ch 6)
-      for (const t of ['impf', 'fut']) p[t].forEach((f, i) => add(f, { ...base, ch: tch, mood: 'ind', tense: t, voice: 'act', person: PERSONS[i][0], number: PERSONS[i][1] }));
+      const tch = Math.max(lex.ch, lex.irreg === 'sum' || lex.irreg === 'possum' ? 6 : lex.conj === 3 ? 8 : 5);   // imperfect & future: Ch 5 (sum, possum: Ch 6; 3rd conjugation: Ch 8)
+      for (const t of ['impf', 'fut']) if (p[t]) p[t].forEach((f, i) => add(f, { ...base, ch: tch, mood: 'ind', tense: t, voice: 'act', person: PERSONS[i][0], number: PERSONS[i][1] }));
       add(p.inf, { ...base, mood: 'inf', tense: 'pres', voice: 'act' });
       if (p.impSg) {
         add(p.impSg, { ...base, mood: 'imp', tense: 'pres', voice: 'act', number: 'sg' });
@@ -162,10 +178,11 @@ export function buildAnalyzer(lexicon) {
       }
     } else if (lex.pos === 'noun') {
       const par = declineNoun(lex);
-      for (const n of (lex.plOnly ? ['pl'] : NUMS)) for (const c of CASES) {
+      const nch = lex.type === '3' || lex.type === '3n' ? Math.max(lex.ch, 7) : lex.ch;
+      for (const n of (lex.plOnly ? ['pl'] : lex.sgOnly ? ['sg'] : NUMS)) for (const c of CASES) {
         const forms = new Set(nounForm(lex, c, n));
         const gs = lex.plNeut && n === 'pl' ? ['n'] : genders(lex);
-        for (const f of forms) for (const g of gs) add(f, { ...base, case: c, number: n, gender: g, nounGender: lex.gender });
+        for (const f of forms) for (const g of gs) add(f, { ...base, ch: nch, case: c, number: n, gender: g, nounGender: lex.gender });
       }
       void par;
     } else if (lex.pos === 'adj') {
@@ -188,6 +205,10 @@ export function buildAnalyzer(lexicon) {
     variants: (t) => [...new Set((loose.get(strip(String(t).toLowerCase())) || []).map((a) => a.form))],
   };
 }
+
+/** Stem of a noun, read from the genitive: rēx, rēgis → rēg-; amīcus, amīcī → amīc-. */
+export const stemOfNoun = (n) => (n.type === 'er' || n.type === '3' || n.type === '3n' ? n.stem : n.type === 'a' ? n.stem || n.la.slice(0, -1) : n.stem || n.la.slice(0, -2));
+export const ORD = ['', '1st', '2nd', '3rd'];
 
 export function genders(lex) { return lex.gender === 'mf' ? ['m', 'f'] : [lex.gender]; }
 

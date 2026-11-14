@@ -11,7 +11,7 @@ import { CONCEPTS } from '../data/concepts.js';
 import { TOPICS } from '../data/curriculum.js';
 import { SENTENCES, COMPOSE, analyzer } from './corpus.js';
 import { ROLE_LABEL } from './sentences.js';
-import { conjugate, declineNoun, nounForm, adjForm, CASES, NUMS, CASE_NAME, NUM_NAME, GENDER_NAME, PERSONS, TENSE_NAME, strip, canon, describe } from './latin.js';
+import { conjugate, tensesOf, declineNoun, nounForm, adjForm, CASES, NUMS, CASE_NAME, NUM_NAME, GENDER_NAME, PERSONS, TENSE_NAME, strip, canon, describe } from './latin.js';
 import { parseSlot } from './grade.js';
 
 // ------------------------------------------------------------------ helpers
@@ -76,6 +76,7 @@ export function whyTense(lex, t, idx) {
   const p = conjugate(lex); const form = p[t][idx];
   if (lex.irreg === 'sum') return `${L(form)} is the ${TENSE_NAME[t]} of {sum}, ${PERS_LABEL[idx]}: ${L(p[t].join(', '))}.`;
   if (lex.irreg === 'possum') return `${L(form)} = {pot-} + ${L(conjugate({ irreg: 'sum' })[t][idx])} (${TENSE_NAME[t]} of sum), ${PERS_LABEL[idx]}.`;
+  if (lex.conj === 3 && t === 'fut') return `${L(form)} = present stem ${L(p.base + '-')} + ${L(['-am', '-ēs', '-et', '-ēmus', '-ētis', '-ent'][idx])} (future, ${PERS_LABEL[idx]}). The 3rd conjugation does NOT use -b-: the future is ${L('-am')} in the 1st person singular and ${L('-ē-')} + the personal ending in all the others.`;
   const e = (t === 'impf' ? ['-bam', '-bās', '-bat', '-bāmus', '-bātis', '-bant'] : ['-bō', '-bis', '-bit', '-bimus', '-bitis', '-bunt'])[idx];
   return `${L(form)} = present stem ${L(p.stem + '-')} + ${L(e)} (${TENSE_NAME[t]}, ${PERS_LABEL[idx]}). ${t === 'impf' ? 'The sign of the imperfect is -bā-.' : 'The future sign is -b- with ō / i / u: -bō, -bi-, -bu-.'}${lex.irreg === 'do' ? ' dō keeps its short a: da-.' : ''}`;
 }
@@ -88,19 +89,22 @@ export function whyVerbForm(lex, idx) {
   if (lex.irreg === 'possum') return `${L(form)} is ${PERS_LABEL[idx]} of {possum} = {pot-}/{pos-} + {sum}: {possum, potes, potest, possumus, potestis, possunt}.`;
   const endings = ['-ō', '-s', '-t', '-mus', '-tis', '-nt'];
   const person = PERS_LABEL[idx];
+  if (lex.conj === 3) return `${L(form)} = ${L(p.base + '-')} + ${L(['-ō', '-is', '-it', '-imus', '-itis', '-unt'][idx])} (${person}). The 3rd conjugation stem vowel is a short -e- (${L(lex.pp[1])}); before most endings it weakens to -i-, and before -nt it becomes -u- (${L('-unt')}). In the 1st person singular it simply disappears.`;
   if (lex.irreg === 'do') return `${L(form)} = {d-} + the stem vowel a + ${L(endings[idx])}: ${person}. In {dō} the a is short everywhere except {dās} (and the imperative {dā}).`;
   if (idx === 0) return `${L(form)}: the 1st person singular ending is ${L('-ō')}; ${lex.conj === 1 ? 'the stem vowel ā disappears before it' : 'the stem is {' + p.base + 'e-}'} — the first principal part is itself this form.`;
   return `${L(form)} = present stem ${L(p.stem + '-')} + ${L(endings[idx])} (${person}).${idx === 2 || idx === 5 ? ' The vowel is short before final -t / -nt.' : ' The stem vowel stays long.'}`;
 }
 export function whyNounForm(lex, c, n) {
   const f = nounForm(lex, c, n)[0];
-  const stemOf = (lx) => (lx.type === 'er' ? lx.stem : lx.type === 'a' ? lx.la.slice(0, -1) : lx.la.slice(0, -2));
+  const stemOf = (lx) => (lx.type === 'er' || lx.type === '3' || lx.type === '3n' ? lx.stem : lx.type === 'a' ? lx.stem || lx.la.slice(0, -1) : lx.stem || lx.la.slice(0, -2));
   const stem = stemOf(lex);
-  const ends = { a: { sg: ['-a', '-ae', '-ae', '-am', '-ā', '-a'], pl: ['-ae', '-ārum', '-īs', '-ās', '-īs', '-ae'] }, m: { sg: ['-us', '-ī', '-ō', '-um', '-ō', '-e'], pl: ['-ī', '-ōrum', '-īs', '-ōs', '-īs', '-ī'] }, n: { sg: ['-um', '-ī', '-ō', '-um', '-ō', '-um'], pl: ['-a', '-ōrum', '-īs', '-a', '-īs', '-a'] } };
-  const set = lex.type === 'a' ? 'a' : (lex.type === 'um' || lex.type === 'ium') ? 'n' : 'm';
+  const ends = { a: { sg: ['-a', '-ae', '-ae', '-am', '-ā', '-a'], pl: ['-ae', '-ārum', '-īs', '-ās', '-īs', '-ae'] }, 3: { sg: ['—', '-is', '-ī', '-em', '-e', '—'], pl: ['-ēs', '-um', '-ibus', '-ēs', '-ibus', '-ēs'] }, '3n': { sg: ['—', '-is', '-ī', '—', '-e', '—'], pl: ['-a', '-um', '-ibus', '-a', '-ibus', '-a'] }, m: { sg: ['-us', '-ī', '-ō', '-um', '-ō', '-e'], pl: ['-ī', '-ōrum', '-īs', '-ōs', '-īs', '-ī'] }, n: { sg: ['-um', '-ī', '-ō', '-um', '-ō', '-um'], pl: ['-a', '-ōrum', '-īs', '-a', '-īs', '-a'] } };
+  const set = lex.type === 'a' ? 'a' : lex.type === '3' || lex.type === '3n' ? lex.type : (lex.type === 'um' || lex.type === 'ium') ? 'n' : 'm';
   const e = ends[set][n][CASES.indexOf(c)];
   const label = `${CASE_NAME[c]} ${NUM_NAME[n]}`;
   let s = `${L(f)} = stem ${L(stem + '-')} + ${L(e)} (${label}).`;
+  if ((set === '3' || set === '3n') && n === 'sg' && (c === 'nom' || c === 'voc' || (set === '3n' && c === 'acc'))) s = `${L(f)}: a 3rd-declension noun has no regular nominative ending, so the nominative is learned by heart (${L(lex.la + ', ' + lex.gen)}); ${CASE_NAME[c]} singular = the nominative form.${set === '3n' && c !== 'nom' ? ' Neuter rule: nominative, accusative and vocative are identical.' : ''} The stem ${L(stem + '-')} comes from the genitive ${L(lex.gen)}.`;
+  else if (set === '3' || set === '3n') s += ` The stem ${L(stem + '-')} comes from the genitive singular ${L(lex.gen)}, never from the nominative.${set === '3n' && n === 'pl' && (c === 'nom' || c === 'acc' || c === 'voc') ? ' Neuter plurals always end in -a.' : ''}`;
   if (lex.type === 'er' && n === 'sg' && (c === 'nom' || c === 'voc')) s = `${L(f)}: -er nouns have no ending in the nominative and vocative singular (${label}).`;
   if (set === 'n' && (c === 'nom' || c === 'acc' || c === 'voc')) s += n === 'pl' ? ' Neuter rule: nominative, accusative and vocative are identical, and plural neuter always ends in -a.' : ' Neuter rule: nominative, accusative and vocative are identical.';
   if (lex.type === 'er' && lex.stem !== lex.la && c !== 'nom' && c !== 'voc') s += ` Note the stem ${L(lex.stem + '-')}: the -e- of ${L(lex.la)} drops out.`;
@@ -154,7 +158,7 @@ function genPrincipalParts() {
     if (w.irreg !== 'sum' && w.irreg !== 'possum') {
       const rand = rng(hash('conj:' + w.id));
       void rand;
-      out.push(finish({ ...base, id: `pp:conj:${w.id}`, diff: 1, type: 'mcq', prompt: `To which conjugation does ${L(w.pp[0] + ', ' + w.pp[1])} belong?`, options: ['1st conjugation', '2nd conjugation'], answer: w.conj === 1 ? '1st conjugation' : '2nd conjugation', explanation: `The infinitive ${L(w.pp[1])} ends in ${w.conj === 1 ? L('-āre') : L('-ēre')}, so it is ${w.conj === 1 ? '1st' : '2nd'} conjugation.${w.irreg === 'do' ? ' (dō has a short a: dare.)' : ''}`, rule: 'c1.stem' }));
+      out.push(finish({ ...base, id: `pp:conj:${w.id}`, diff: 1, type: 'mcq', prompt: `To which conjugation does ${L(w.pp[0] + ', ' + w.pp[1])} belong?`, options: ['1st conjugation', '2nd conjugation', '3rd conjugation'], answer: ['', '1st', '2nd', '3rd'][w.conj] + ' conjugation', explanation: w.conj === 3 ? `The infinitive ${L(w.pp[1])} ends in a SHORT ${L('-ere')} (no macron), so it is 3rd conjugation; compare 2nd conjugation ${L('-ēre')}. The first principal part ends in plain ${L('-ō')}, not ${L('-eō')}.` : `The infinitive ${L(w.pp[1])} ends in ${w.conj === 1 ? L('-āre') : L('-ēre')}, so it is ${w.conj === 1 ? '1st' : '2nd'} conjugation.${w.irreg === 'do' ? ' (dō has a short a: dare.)' : ''}`, rule: 'c1.stem' }));
     }
   }
   return out;
@@ -166,8 +170,8 @@ function genConjugation() {
     const p = conjugate(w);
     const irr = w.irreg === 'sum' || w.irreg === 'possum';
     const sum = irr;
-    const topic = w.irreg === 'sum' ? 'sum' : w.irreg === 'possum' ? 'sum-possum' : 'verb-forms';
-    const rule = w.irreg === 'sum' ? 'c4.sum' : w.irreg === 'possum' ? 'c6.possum' : 'c1.endings';
+    const topic = w.irreg === 'sum' ? 'sum' : w.irreg === 'possum' ? 'sum-possum' : w.conj === 3 ? 'conj3' : 'verb-forms';
+    const rule = w.irreg === 'sum' ? 'c4.sum' : w.irreg === 'possum' ? 'c6.possum' : w.conj === 3 ? 'c8.conj3' : 'c1.endings';
     PERSONS.forEach(([pers, num], idx) => {
       const form = p.ind[idx];
       out.push(finish({ id: `cf:${w.id}:${idx}`, ch: w.ch, topic, diff: idx === 0 || idx === 3 ? 1 : 2, type: 'typed', lang: 'la', prompt: `Give the ${PERS_LABEL[idx]}, present active indicative, of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
@@ -177,25 +181,25 @@ function genConjugation() {
     [h % 6, (h + 3) % 6].forEach((idx, k) => {
       const rand = rng(hash(`cid:${w.id}:${idx}`));
       const opts = mcqOptions(PERS_LABEL[idx], PERS_LABEL, rand);
-      out.push(finish({ id: `cid:${w.id}:${idx}`, ch: w.ch, topic: irr ? topic : 'verb-id', diff: 1, type: 'mcq', prompt: `Which person and number is ${L(p.ind[idx])}? (present active indicative of ${L(w.pp[0])})`, options: opts, answer: PERS_LABEL[idx], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
+      out.push(finish({ id: `cid:${w.id}:${idx}`, ch: w.ch, topic: irr || w.conj === 3 ? topic : 'verb-id', diff: 1, type: 'mcq', prompt: `Which person and number is ${L(p.ind[idx])}? (present active indicative of ${L(w.pp[0])})`, options: opts, answer: PERS_LABEL[idx], explanation: whyVerbForm(w, idx), rule, vocab: [w.id] }));
       void k;
       const correct = engVerb(w, 'pres', idx); if (!correct) return;
       const wrong = [0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => engVerb(w, 'pres', i));
-      out.push(finish({ id: `ctr:${w.id}:${idx}`, ch: w.ch, topic: irr ? topic : 'verb-forms', diff: 1, type: 'mcq', prompt: `Choose the best translation of ${L(p.ind[idx])}.`, options: mcqOptions(correct, wrong, rng(hash('ctr' + w.id + idx))), answer: correct, explanation: whyVerbForm(w, idx) + (irr ? '' : ` Present tense also translates as “am/is/are ___ing”.`), rule: irr ? rule : 'c1.translate', vocab: [w.id] }));
+      out.push(finish({ id: `ctr:${w.id}:${idx}`, ch: w.ch, topic: irr || w.conj === 3 ? topic : 'verb-forms', diff: 1, type: 'mcq', prompt: `Choose the best translation of ${L(p.ind[idx])}.`, options: mcqOptions(correct, wrong, rng(hash('ctr' + w.id + idx))), answer: correct, explanation: whyVerbForm(w, idx) + (irr ? '' : ` Present tense also translates as “am/is/are ___ing”.`), rule: irr ? rule : 'c1.translate', vocab: [w.id] }));
     });
     // ---- imperfect & future (Ch 5; sum and possum Ch 6)
-    const tch = Math.max(w.ch, irr ? 6 : 5), ttopic = irr ? 'sum-possum' : 'tenses', trule = (t) => (irr ? (w.irreg === 'possum' ? 'c6.possum' : 'c6.sum-tenses') : t === 'impf' ? 'c5.imperfect' : 'c5.future');
-    for (const t of ['impf', 'fut']) {
+    const tch = Math.max(w.ch, irr ? 6 : w.conj === 3 ? 8 : 5), ttopic = irr ? 'sum-possum' : w.conj === 3 ? 'conj3' : 'tenses', trule = (t) => (w.conj === 3 ? 'c8.future3' : irr ? (w.irreg === 'possum' ? 'c6.possum' : 'c6.sum-tenses') : t === 'impf' ? 'c5.imperfect' : 'c5.future');
+    for (const t of tensesOf(w).filter((x) => x !== 'pres')) {
       PERSONS.forEach((_, idx) => {
         out.push(finish({ id: `cft:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 2, type: 'typed', lang: 'la', prompt: `Give the ${PERS_LABEL[idx]}, ${TENSE_NAME[t]} active indicative, of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [p[t][idx]], explanation: whyTense(w, t, idx), rule: trule(t), vocab: [w.id] }));
       });
       const ht = hash(`t:${w.id}:${t}`);
       const idx = ht % 6;
       const form = p[t][idx];
-      out.push(finish({ id: `tid:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 1, type: 'mcq', prompt: `Which tense is ${L(form)}? (from ${L(w.pp[0])})`, options: ['present', 'imperfect', 'future'], answer: TENSE_NAME[t], explanation: whyTense(w, t, idx), rule: trule(t), vocab: [w.id] }));
+      out.push(finish({ id: `tid:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 1, type: 'mcq', prompt: `Which tense is ${L(form)}? (from ${L(w.pp[0])})`, options: w.conj === 3 ? ['present', 'future'] : ['present', 'imperfect', 'future'], answer: TENSE_NAME[t], explanation: whyTense(w, t, idx), rule: trule(t), vocab: [w.id] }));
       const correct = engVerb(w, t, idx);
       if (correct) {
-        const wrong = [...['pres', 'impf', 'fut'].filter((x) => x !== t).map((x) => engVerb(w, x, idx)), ...[0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => engVerb(w, t, i))].filter(Boolean);
+        const wrong = [...tensesOf(w).filter((x) => x !== t).map((x) => engVerb(w, x, idx)), ...[0, 1, 2, 3, 4, 5].filter((i) => i !== idx).map((i) => engVerb(w, t, i))].filter(Boolean);
         const opts = mcqOptions(correct, wrong, rng(hash(`ttr:${w.id}:${t}`)));
         if (opts) out.push(finish({ id: `ttr:${w.id}:${t}:${idx}`, ch: tch, topic: ttopic, diff: 2, type: 'mcq', prompt: `Choose the best translation of ${L(form)}.`, options: opts, answer: correct, explanation: whyTense(w, t, idx) + (t === 'impf' ? ' The imperfect can also be translated “used to ___” or “kept ___ing”.' : ''), rule: trule(t), vocab: [w.id] }));
       }
@@ -203,13 +207,13 @@ function genConjugation() {
     if (p.impSg) {
       const kinds = [['inf', p.inf, 'present infinitive', 'present active infinitive'], ['impSg', p.impSg, 'singular imperative', 'singular imperative (command to one person)'], ['impPl', p.impPl, 'plural imperative', 'plural imperative (command to several people)']];
       for (const [k, form, label] of kinds) {
-        out.push(finish({ id: `ik:${w.id}:${k}`, ch: 1, topic: 'inf-imp', diff: 2, type: 'typed', lang: 'la', prompt: `Give the ${label} of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: `${L(form)}: ${k === 'inf' ? 'present stem + -re' : k === 'impSg' ? 'the bare present stem' : 'present stem + -te'}${w.irreg === 'do' ? '. (dō: dare, dā, date — the a is short except in dā.)' : '.'}`, rule: k === 'inf' ? 'c1.infinitive' : 'c1.imperative', vocab: [w.id] }));
+        out.push(finish({ id: `ik:${w.id}:${k}`, ch: 1, topic: 'inf-imp', diff: 2, type: 'typed', lang: 'la', prompt: `Give the ${label} of ${L(w.pp[0] + ', ' + w.pp[1])}.`, accept: [form], explanation: `${L(form)}: ${w.conj === 3 ? (k === 'inf' ? 'stem + -ere (short e)' : k === 'impSg' ? (w.impSg ? 'irregular: dūcō has the short imperative dūc (like dīc, fac, fer)' : 'stem + -e') : 'stem + -ite') : k === 'inf' ? 'present stem + -re' : k === 'impSg' ? 'the bare present stem' : 'present stem + -te'}${w.irreg === 'do' ? '. (dō: dare, dā, date — the a is short except in dā.)' : '.'}`, rule: w.conj === 3 ? 'c8.imperative3' : k === 'inf' ? 'c1.infinitive' : 'c1.imperative', vocab: [w.id] }));
       }
       const labels = ['present infinitive', 'singular imperative (command to one person)', 'plural imperative (command to several people)', 'indicative (a statement with a subject)'];
       const h2 = hash('ikid:' + w.id);
       [h2 % 4, (h2 + 2) % 4].forEach((ki) => {
         const form = ki === 0 ? p.inf : ki === 1 ? p.impSg : ki === 2 ? p.impPl : p.ind[4];
-        out.push(finish({ id: `ikid:${w.id}:${ki}`, ch: 1, topic: 'inf-imp', diff: 2, type: 'mcq', prompt: `Identify the form ${L(form)} (from ${L(w.pp[0])}).`, options: labels, answer: labels[ki], explanation: `${L(form)}: ${['infinitive (-re, no person)', 'singular imperative = the bare stem', 'plural imperative = stem + -te', '2nd person plural indicative (-tis)'][ki]}. Compare: ${L([p.inf, p.impSg, p.impPl, p.ind[4]].join(', '))}.`, rule: ki === 0 ? 'c1.infinitive' : ki === 3 ? 'c1.endings' : 'c1.imperative', vocab: [w.id] }));
+        out.push(finish({ id: `ikid:${w.id}:${ki}`, ch: 1, topic: 'inf-imp', diff: 2, type: 'mcq', prompt: `Identify the form ${L(form)} (from ${L(w.pp[0])}).`, options: labels, answer: labels[ki], explanation: `${L(form)}: ${(w.conj === 3 ? ['infinitive (-ere, no person)', 'singular imperative = stem + -e (dūc is irregular)', 'plural imperative = stem + -ite', '2nd person plural indicative (-itis)'] : ['infinitive (-re, no person)', 'singular imperative = the bare stem', 'plural imperative = stem + -te', '2nd person plural indicative (-tis)'])[ki]}. Compare: ${L([p.inf, p.impSg, p.impPl, p.ind[4]].join(', '))}.`, rule: w.conj === 3 ? 'c8.imperative3' : ki === 0 ? 'c1.infinitive' : ki === 3 ? 'c1.endings' : 'c1.imperative', vocab: [w.id] }));
       });
     }
   }
@@ -218,7 +222,7 @@ function genConjugation() {
 
 // a worked example that stays inside the chapter being tested (and is never the asked noun)
 function stemExample(w) {
-  const ex = w.ch === 2 ? [['rosa', '{rosae} → {ros-}'], ['porta', '{portae} → {port-}']] : [['amicus', '{amīcī} → {amīc-}'], ['numerus', '{numerī} → {numer-}']];
+  const ex = w.type === '3' || w.type === '3n' ? [['rex', '{rēgis} → {rēg-}'], ['amor', '{amōris} → {amōr-}']] : w.ch === 2 ? [['rosa', '{rosae} → {ros-}'], ['porta', '{portae} → {port-}']] : [['amicus', '{amīcī} → {amīc-}'], ['numerus', '{numerī} → {numer-}']];
   return (ex.find(([id]) => id !== w.id) || ex[0])[1];
 }
 const NCELLS = [];
@@ -227,19 +231,21 @@ for (const n of NUMS) for (const c of CASES) NCELLS.push([c, n]);
 function genNouns() {
   const out = [];
   for (const w of nouns) {
-    const set = w.type === 'a' ? 'decl1' : w.type === 'er' ? 'er-nouns' : w.type === 'um' || w.type === 'ium' ? 'decl2n' : 'decl2m';
-    const rule = w.type === 'a' ? 'c2.decl1' : w.type === 'er' ? 'c3.er' : (w.type === 'um' || w.type === 'ium') ? 'c4.neuter' : 'c3.decl2m';
+    const set = w.type === '3' || w.type === '3n' ? 'decl3' : w.type === 'a' ? 'decl1' : w.type === 'er' ? 'er-nouns' : w.type === 'um' || w.type === 'ium' ? 'decl2n' : 'decl2m';
+    const rule = w.type === '3' ? 'c7.decl3' : w.type === '3n' ? 'c7.neuter3' : w.type === 'a' ? 'c2.decl1' : w.type === 'er' ? 'c3.er' : (w.type === 'um' || w.type === 'ium') ? 'c4.neuter' : 'c3.decl2m';
     const head = `${L(w.la + ', ' + w.gen)} (${w.en[0]})`;
     for (const [c, n] of NCELLS) {
+      if (c === 'voc' && (w.type === '3' || w.type === '3n')) continue;   // identical to the nominative
       if (c === 'voc' && !w.anim && !(w.type === 'um' || w.type === 'ium')) continue;
       if (w.plOnly && n === 'sg') continue;
+      if (w.sgOnly && n === 'pl') continue;
       out.push(finish({ id: `df:${w.id}:${c}.${n}`, ch: w.ch, topic: w.type === 'er' && c !== 'nom' && c !== 'voc' ? 'er-nouns' : set, diff: c === 'nom' || c === 'acc' ? 1 : c === 'voc' || w.type === 'er' || w.type === 'ius' ? 3 : 2, type: 'typed', lang: 'la', prompt: `Give the ${CASE_NAME[c]} ${NUM_NAME[n]} of ${head}.`, accept: nounForm(w, c, n), explanation: whyNounForm(w, c, n), rule, vocab: [w.id] }));
     }
     // identify: which case/number is possible?
     const h = hash('dcase:' + w.id);
     const cells = [['gen', 'sg'], ['dat', 'sg'], ['acc', 'sg'], ['abl', 'sg'], ['nom', 'pl'], ['gen', 'pl'], ['dat', 'pl'], ['acc', 'pl']];
     [h % 8, (h + 3) % 8].forEach((ci) => {
-      const [c, n] = w.plOnly ? cells[4 + (ci % 4)] : cells[ci];
+      const [c, n] = w.plOnly ? cells[4 + (ci % 4)] : w.sgOnly ? cells[ci % 4] : cells[ci];
       const form = nounForm(w, c, n)[0];
       const poss = new Set(analyzer.analyze(form).filter((a) => a.pos === 'noun').map((a) => `${a.case}.${a.number}`));
       const label = (cn) => { const [cc, nn] = cn.split('.'); return `${CASE_NAME[cc]} ${NUM_NAME[nn]}`; };
@@ -250,7 +256,7 @@ function genNouns() {
       // Ask: which is POSSIBLE — exactly one option is a real analysis of the form.
       out.push(finish({ id: `dcase:${w.id}:${c}.${n}`, ch: w.ch, topic: set === 'decl2n' ? 'decl2n' : set, diff: poss.size > 1 ? 3 : 2, type: 'mcq', prompt: `Which case and number can the form ${L(form)} be? (from ${L(w.la)}; choose the ONE that is possible)`, options: opts, answer: label(`${c}.${n}`), explanation: `${L(form)} can be: ${[...poss].map(label).join(' / ')}. ${whyNounForm(w, c, n)}`, rule, vocab: [w.id] }));
     });
-    out.push(finish({ id: `stem:${w.id}`, ch: w.ch, topic: set, diff: 2, type: 'typed', lang: 'la', prompt: `Give the stem of ${head}. Drop the genitive ending, e.g. ${stemExample(w)}.`, accept: (() => { const s = w.type === 'er' ? w.stem : w.type === 'a' ? w.la.slice(0, -1) : w.la.slice(0, -2); return [s, s + '-']; })(), explanation: `The stem comes from the genitive singular ${L(w.gen)}. ${w.note || ''}`, rule, vocab: [w.id] }));
+    out.push(finish({ id: `stem:${w.id}`, ch: w.ch, topic: set, diff: 2, type: 'typed', lang: 'la', prompt: `Give the stem of ${head}. Drop the genitive ending, e.g. ${stemExample(w)}.`, accept: (() => { const s = w.stem || (w.type === 'a' ? w.la.slice(0, -1) : w.la.slice(0, -2)); return [s, s + '-']; })(), explanation: `The stem comes from the genitive singular ${L(w.gen)}. ${w.note || ''}`, rule, vocab: [w.id] }));
     if (w.gender !== 'mf') {
       const gl = { m: 'masculine', f: 'feminine', n: 'neuter' };
       out.push(finish({ id: `gender:${w.id}`, ch: w.ch, topic: 'gender', diff: w.type === 'a' && w.gender === 'm' ? 3 : 1, type: 'mcq', prompt: `What is the grammatical gender of ${L(w.la + ', ' + w.gen)} (${w.en[0]})?`, options: ['masculine', 'feminine', 'neuter'], answer: gl[w.gender], explanation: `${L(w.la)} is ${gl[w.gender]}. ${w.type === 'a' && w.gender === 'm' ? 'First-declension nouns naming men are masculine: gender is not decided by the -a ending.' : w.type === 'a' ? 'Most first-declension nouns are feminine.' : w.type === 'um' || w.type === 'ium' ? 'Second-declension nouns in -um are neuter.' : 'Second-declension nouns in -us / -er are masculine.'}`, rule: 'c2.gender', vocab: [w.id] }));
@@ -267,7 +273,7 @@ function genAgreement() {
     const h = hash('agree:' + w.id);
     const cells = NCELLS.filter(([c]) => c !== 'voc');
     [h % 10, (h + 5) % 10].forEach((ci, k) => {
-      const [c, n] = w.plOnly ? [cells[ci][0], 'pl'] : cells[ci];
+      const [c, n] = w.plOnly ? [cells[ci][0], 'pl'] : w.sgOnly ? [cells[ci][0], 'sg'] : cells[ci];
       const allowed = adjs.filter((a) => !a.plOnly);
       const a = allowed[(h >>> (k * 3)) % allowed.length];
       const g = w.plNeut && n === 'pl' ? 'n' : w.gender;

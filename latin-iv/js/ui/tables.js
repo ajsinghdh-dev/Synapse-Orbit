@@ -1,6 +1,6 @@
 // Paradigm tables used by Study, Reference and the labs.
 import { BY_ID } from '../data/lexicon.js';
-import { conjugate, declineNoun, declineAdj, CASES, CASE_NAME, NUMS, PERSONS, TENSE_NAME } from '../core/latin.js';
+import { conjugate, stemOfNoun, declineNoun, declineAdj, CASES, CASE_NAME, NUMS, PERSONS, TENSE_NAME } from '../core/latin.js';
 import { esc } from './util.js';
 
 const CN = { nom: 'Nominative', gen: 'Genitive', dat: 'Dative', acc: 'Accusative', abl: 'Ablative', voc: 'Vocative' };
@@ -21,7 +21,7 @@ export function sumTable() {
   const p = conjugate(BY_ID.sum);
   return `<div class="tscroll"><table class="ptable"><thead><tr><th></th><th>Singular</th><th>Plural</th></tr></thead><tbody>${[0, 1, 2].map((r) => `<tr><th>${PL[r]} person</th><td class="la">${esc(p.ind[r])}</td><td class="la">${esc(p.ind[r + 3])}</td></tr>`).join('')}</tbody></table></div><p class="small muted mt1">Infinitive: <span class="la">esse</span> · principal parts <span class="la">sum, esse, fuī, futūrus</span></p>`;
 }
-function stemOf(n) { return n.type === 'er' ? n.stem : n.type === 'a' ? n.la.slice(0, -1) : n.la.slice(0, -2); }
+const stemOf = stemOfNoun;
 export function declTable(nounIds, { split: sp = true } = {}) {
   const ns = nounIds.map((i) => BY_ID[i]);
   const ds = ns.map(declineNoun);
@@ -40,7 +40,7 @@ export function casesTable() {
 /** One tense of several verbs, with the tense sign highlighted. */
 export function tenseTable(ids, t) {
   const vs = ids.map((i) => BY_ID[i]); const ps = vs.map(conjugate);
-  const hl = (f, v, p) => (v.irreg ? esc(f) : `<span class="st">${esc(f.slice(0, p.stem.length))}</span><span class="end">${esc(f.slice(p.stem.length))}</span>`);
+  const hl = (f, v, p) => { const n = v.conj === 3 ? p.base.length : p.stem.length; return v.irreg ? esc(f) : `<span class="st">${esc(f.slice(0, n))}</span><span class="end">${esc(f.slice(n))}</span>`; };
   return `<div class="tscroll"><table class="ptable"><thead><tr><th>${TENSE_NAME[t] || 'present'}</th>${vs.map((v) => `<th colspan="2"><span class="la">${esc(v.pp[0])}, ${esc(v.pp[1])}</span></th>`).join('')}</tr><tr><th></th>${vs.map(() => '<th>Singular</th><th>Plural</th>').join('')}</tr></thead><tbody>${[0, 1, 2].map((r) => `<tr><th>${PL[r]} person</th>${vs.map((v, i) => [r, r + 3].map((idx) => `<td class="la">${hl(ps[i][t][idx], v, ps[i])}</td>`).join('')).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 export const TABLES = {
@@ -59,5 +59,10 @@ export const TABLES = {
   'decl-2n': () => declTable(['bellum', 'donum']),
   sum: sumTable,
   'adj-all': () => adjTable('bonus'),
+  'decl-3m': () => declTable(['rex', 'amor']),
+  'decl-3n': () => declTable(['nomen', 'corpus']),
+  'conj3-pres': () => verbTable(['duco', 'scribo']),
+  'conj3-fut': () => tenseTable(['duco', 'scribo'], 'fut'),
+  'conj3-imp': () => verbFormsTable(['duco', 'scribo', 'ago', 'vinco']),
 };
 void PERSONS; void CASE_NAME;

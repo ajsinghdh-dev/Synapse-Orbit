@@ -27,7 +27,7 @@ export function parseLine(line, defaultCh = 1, existing = new Map()) {
   const parts = f[0].split(',').map(clean).filter(Boolean);
   const en = f[1].split(/,|\//).map((s) => s.replace(/\([^)]*\)/g, '').trim()).filter(Boolean);
   let ch = defaultCh;
-  if (f[2]) { const n = parseInt(f[2], 10); if ([1, 2, 3, 4, 5, 6].includes(n)) ch = n; else if (f[2]) { errors.push(`Chapter must be 1–6 (got “${f[2]}”)`); } }
+  if (f[2]) { const n = parseInt(f[2], 10); if ([1, 2, 3, 4, 5, 6, 7, 8].includes(n)) ch = n; else if (f[2]) { errors.push(`Chapter must be 1–8 (got “${f[2]}”)`); } }
   const tag = (f[3] || '').toLowerCase();
   if (!en.length) errors.push('Give at least one English meaning');
   if (errors.length) return out();

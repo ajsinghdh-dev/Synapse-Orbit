@@ -139,7 +139,7 @@ export function gradeCompose(input, slotSpecs, { strict = false } = {}) {
   });
   const extras = toks.filter((_, ti) => !best.map.includes(ti)).filter((tk) => !detail.some((d) => d.token === tk.w && !d.ok && d.wrongForm));
   for (const e of extras) {
-    if (!e.cands.length) messages.push(`“${e.w}” is not a Latin form in the Chapters 1–6 vocabulary — check the spelling.`);
+    if (!e.cands.length) messages.push(`“${e.w}” is not a Latin form in the Chapters 1–8 vocabulary — check the spelling.`);
     else messages.push(`Extra word: “${e.w}” is not needed for this sentence.`);
   }
   const okCount = detail.filter((d) => d.ok).length;

@@ -90,7 +90,7 @@ test('mock exams: size, section weights, chapter coverage, no duplicate skills',
     assert.equal(new Set(m.items).size, m.items.length);
     const qs = m.items.map((id) => Q_BY_ID[id]);
     const chs = new Set(qs.map((q) => q.ch));
-    if (fmt === 'comprehensive') assert.equal(chs.size, 6, fmt + ' covers all six chapters');
+    if (fmt === 'comprehensive') assert.equal(chs.size, 8, fmt + ' covers all eight chapters');
     if (fmt === 'standard') assert.ok(chs.size >= 5, fmt + ' covers nearly every chapter');
     const counts = apportion(FORMATS[fmt].weights, FORMATS[fmt].n);
     for (const [sec, n] of Object.entries(counts)) assert.equal(qs.filter((q) => q.section === sec).length, n, `${fmt} ${sec}`);

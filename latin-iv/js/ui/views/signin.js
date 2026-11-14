@@ -11,9 +11,9 @@ export function showSignin(onEnter) {
   el.id = 'gate'; el.className = 'signin';
   el.innerHTML = `
     <div class="si-copy">
-      <div class="si-top"><b>LATIN <i>IV</i></b><span>Wheelock’s Latin · 7th ed. · Ch. 1–6</span></div>
+      <div class="si-top"><b>LATIN <i>IV</i></b><span>Wheelock’s Latin · 7th ed. · Ch. 1–8</span></div>
       <h1>Master the language.<br>Conquer the exam.</h1>
-      <p class="si-lead">Vocabulary with spaced repetition, a grammar lab, translation practice and timed mock exams, built around the first six chapters of Wheelock.</p>
+      <p class="si-lead">Vocabulary with spaced repetition, a grammar lab, translation practice and timed mock exams, built around the first eight chapters of Wheelock.</p>
       <div class="si-actions">
         <button class="btn lg si-go" id="si-go">${hosted ? 'Continue with your Claude account' : 'Start on this device'}</button>
         ${hosted ? '<button class="btn lg si-alt" id="si-local">Use this device only</button>' : ''}
@@ -21,7 +21,7 @@ export function showSignin(onEnter) {
       <p class="si-note" id="si-note" role="status">${hosted
         ? 'No password to create. This page already opens inside your Claude account, so signing in links your progress to it and keeps it in step on every device.'
         : 'Opened outside Claude, so there is no account to sign in to here. Progress is saved in this browser.'}</p>
-      <ul class="si-facts"><li><b>${LEXICON.length}</b>words</li><li><b>6</b>chapters</li><li><b>7</b>grammar drills</li><li><b>2,600+</b>questions</li></ul>
+      <ul class="si-facts"><li><b>${LEXICON.length}</b>words</li><li><b>8</b>chapters</li><li><b>7</b>grammar drills</li><li><b>2,600+</b>questions</li></ul>
     </div>
     <div class="si-art">${art('laocoon', 'si-hero')}<div class="si-strip">${art('head')}${art('krater')}${art('discobolus')}</div></div>`;
   document.body.appendChild(el);

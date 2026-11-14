@@ -1,5 +1,5 @@
 // LATIN IV — original practice sentences, written for this app and limited to the vocabulary of
-// Wheelock's Latin (7th ed.) Chapters 1–4 (every word is checked against the lexicon by tests).
+// Wheelock's Latin (7th ed.) Chapters 1–8 (every word is checked against the lexicon by tests).
 // Roles: S V O I G A N AP P PO VOC INF C D X — see js/core/sentences.js.
 const S = (ch, lvl, t, en, k, o = {}) => ({ ch, lvl, t, en, k, alts: o.alts || [], note: o.note || '', p: o.p });
 
@@ -15,7 +15,7 @@ export const SENTENCE_DEFS = [
   S(1, 2, 'saepe/D errās/V', 'You often make mistakes.', ['S:\\byou\\b', 'D:often', 'V:err|wander|mistake|astray'], { alts: ['You often err.', 'You often wander.'] }),
   S(1, 2, 'dēbēmus/V cōnservāre/INF', 'We ought to preserve.', ['S:\\bwe\\b', 'V:ought|must|should|have to', 'INF:preserv|conserv|maintain'], { alts: ['We must preserve.', 'We should conserve.'], note: 'cōnservāre is a complementary infinitive after dēbēmus.' }),
   S(1, 2, 'laudāre/INF dēbēs/V', 'You ought to praise.', ['S:\\byou\\b', 'V:ought|must|should|have to', 'INF:prais'], { alts: ['You must praise.', 'You should praise.'], note: 'Infinitive (-āre) vs. indicative (-ās): laudāre has no person.' }),
-  S(1, 2, 'nihil/X vidēmus/V', 'We see nothing.', ['S:\\bwe\\b', 'V:\\bsee|understand|observ', 'X:nothing|anything'], { alts: ['We do not see anything.'], note: 'nihil “nothing” is an indeclinable noun; here it is the object.' }),
+  S(4, 2, 'nihil/X vidēmus/V', 'We see nothing.', ['S:\\bwe\\b', 'V:\\bsee|understand|observ', 'X:nothing|anything'], { alts: ['We do not see anything.'], note: 'nihil “nothing” is an indeclinable noun; here it is the object.' }),
   S(1, 2, 'quid/X cōgitās/V', 'What are you thinking?', ['X:what', 'S:\\byou\\b', 'V:think|ponder|consider|plan'], { alts: ['What do you think?', 'What are you planning?'], p: '?' }),
   S(1, 3, 'sī/C valēs/V valeō/V', 'If you are well, I am well.', ['C:\\bif\\b', 'S:\\byou\\b', 'V:well|strong', 'S:\\bI\\b', 'V:well|strong'], { alts: ['If you are strong, I am strong.'], note: 'A classic Roman letter opening. Two verbs, two subjects in the endings: -s (you), -ō (I).' }),
   S(1, 3, 'sī/C errāmus/V nōn/D laudātis/V', 'If we make a mistake, you do not praise.', ['C:\\bif\\b', 'S:\\bwe\\b', 'V:err|mistake|wander', 'D:\\bnot\\b|n\'t', 'V:prais'], { alts: ['If we err, you (pl.) do not praise.'] }),
@@ -53,7 +53,7 @@ export const SENTENCE_DEFS = [
   S(3, 3, 'agricola,/S vir/AP/nom Rōmānus,/A fīliōs/O monet/V', 'The farmer, a Roman man, warns his sons.', ['S:farmer\\b', 'AP:man\\b', 'A:roman', 'V:warn|advis|remind', 'O:sons\\b'], { alts: ['The farmer, a Roman, advises his sons.'], note: 'vir Rōmānus is in apposition to agricola: it renames the subject and stays nominative.' }),
   S(3, 3, 'virī/S fēminam,/O amīcam/AP/acc fīliae,/G laudant/V', 'The men praise the woman, their daughter’s friend.', ['S:men\\b', 'V:prais', 'O:woman\\b', 'AP:friend\\b', 'G:daughter'], { alts: ['The men praise the woman, the friend of the daughter.'], note: 'amīcam is in apposition to fēminam: both accusative.' }),
   S(3, 3, 'interim/D puerī/S in/P agrīs/PO/abl errant/V', 'Meanwhile the boys wander in the fields.', ['D:meanwhile', 'S:boys\\b|children', 'V:wander|err|astray', 'PO:fields\\b|farms\\b'], { note: 'agrīs = ablative plural after in.' }),
-  S(3, 3, 'tum/D vir/S puerīs/I pecūniam/O dat/V', 'Then the man gives money to the boys.', ['D:\\bthen\\b|thereupon|at that time', 'S:man\\b', 'V:give|gives|giving|offer', 'O:money', 'I:boys\\b|children'], { alts: ['Then the man gives the boys money.'] }),
+  S(5, 3, 'tum/D vir/S puerīs/I pecūniam/O dat/V', 'Then the man gives money to the boys.', ['D:\\bthen\\b|thereupon|at that time', 'S:man\\b', 'V:give|gives|giving|offer', 'O:money', 'I:boys\\b|children'], { alts: ['Then the man gives the boys money.'] }),
 
   // ───────────── Chapter 4 — neuters, sum, predicate nominative, substantives
   S(4, 1, 'bellum/S est/V malum/N', 'War is evil.', ['S:war\\b', 'V:\\bis\\b', 'N:evil|bad|wicked'], { alts: ['War is bad.', 'The war is bad.'], note: 'malum is a predicate adjective: neuter nominative singular, like bellum.' }),
@@ -85,7 +85,7 @@ export const SENTENCE_DEFS = [
   S(5, 2, 'crās/D amīcōs/O adiuvābimus/V', 'Tomorrow we shall help our friends.', ['D:tomorrow', 'S:\\bwe\\b', 'V:(shall|will)\\s+(help|aid|assist)', 'O:friends\\b'], { alts: ['Tomorrow we will help the friends.'] }),
   S(5, 2, 'herī/D in/P agrō/PO/abl manēbant/V', 'Yesterday they were staying in the field.', ['D:yesterday', 'S:\\bthey\\b', 'V:were\\s+(stay|remain)|stayed|remained', 'PO:field\\b|farm\\b'], { alts: ['Yesterday they remained in the field.'] }),
   S(5, 2, 'patriam/O nostram/A līberam/A cōnservābimus/V', 'We shall preserve our free fatherland.', ['S:\\bwe\\b', 'V:(shall|will)\\s+(preserve|conserve|maintain)', 'A:\\bour\\b', 'A:free', 'O:fatherland|country|native land'], { note: 'nostram and līberam both agree with patriam (accusative singular feminine).' }),
-  S(5, 2, 'fēmina/S pulchra/A fīliōs/O vestrōs/A adiuvābat/V', 'The beautiful woman was helping your sons.', ['S:woman\\b', 'A:beautiful|handsome|fine', 'V:was\\s+(help|aid|assist)|used to\\s+help', 'A:\\byour\\b', 'O:sons\\b'], { note: 'pulchra drops its -e- (pulcher, pulchra); vestrōs = “your” (plural owners).' }),
+  S(6, 2, 'fēmina/S pulchra/A fīliōs/O vestrōs/A adiuvābat/V', 'The beautiful woman was helping your sons.', ['S:woman\\b', 'A:beautiful|handsome|fine', 'V:was\\s+(help|aid|assist)|used to\\s+help', 'A:\\byour\\b', 'O:sons\\b'], { note: 'pulchra drops its -e- (pulcher, pulchra); vestrōs = “your” (plural owners).' }),
   S(5, 2, 'glōria/S virōrum/G Rōmānōrum/A manēbit/V', 'The glory of the Roman men will remain.', ['S:glory|fame', 'G:men\\b', 'A:roman', 'V:(will|shall)\\s+(remain|stay|abide|continue)'], { alts: ['The glory of the Romans will last.'] }),
   S(5, 2, 'caelum/O pulchrum/A vidēbāmus/V', 'We were looking at the beautiful sky.', ['S:\\bwe\\b', 'V:were\\s+(see|look|watch)|used to\\s+see', 'A:beautiful|fine', 'O:sky|heaven'], { alts: ['We used to see the beautiful sky.'] }),
   S(5, 3, 'propter/P culpam/PO tuam/A glōriam/O nōn/D habēbis/V', 'Because of your fault you will not have glory.', ['PO:fault|blame', 'A:\\byour\\b', 'S:\\byou\\b', 'D:\\bnot\\b|n\'t', 'V:(will|shall)', 'O:glory|fame'], { alts: ['On account of your fault you will not have fame.'], note: 'propter + accusative; tuam agrees with culpam.' }),
@@ -109,6 +109,41 @@ export const SENTENCE_DEFS = [
   S(6, 3, 'in/P locō/PO/abl secundō/A manēre/INF poterāmus/V', 'We were able to remain in a favorable place.', ['PO:place', 'A:favorable|favourable|second', 'S:\\bwe\\b', 'V:able|could', 'INF:remain|stay'], { alts: ['We could stay in a favorable place.'] }),
   S(6, 3, 'Graecī/S et/C Rōmānī/S librōs/O habēbant/V', 'The Greeks and the Romans had books.', ['S:greeks', 'C:\\band\\b', 'S:romans', 'V:\\bhad\\b|were having|used to have', 'O:books\\b'], { note: 'Graecī and Rōmānī are substantive adjectives: “the Greeks”, “the Romans”.' }),
   S(6, 3, 'loca/S plēna/N perīculōrum/G erant/V', 'The places were full of dangers.', ['S:places\\b', 'V:\\bwere\\b', 'N:full', 'G:dangers|risks'], { note: 'loca: the plural of locus is neuter, so plēna is neuter too.' }),
+  // ───────────── Chapter 7 — third declension nouns; post, sub; audeō, necō
+  S(7, 1, 'rēx/S terram/O amat/V', 'The king loves the land.', ['S:king\\b', 'V:\\blov|\\blik', 'O:land|earth|ground|country'], { alts: ['The king loves the earth.', 'The king loves the country.'], note: 'rēx is nominative singular (subject); terram is accusative (-am).' }),
+  S(7, 1, 'rēgīna/S rēgem/O laudat/V', 'The queen praises the king.', ['S:queen\\b', 'V:prais', 'O:king\\b'], { note: 'rēgīna is a 1st-declension noun; rēgem is 3rd declension (stem rēg-), accusative singular -em.' }),
+  S(7, 1, 'puellae/S pācem/O amant/V', 'The girls love peace.', ['S:girls\\b', 'V:\\blov|\\blik', 'O:peace\\b'], { note: 'pācem: accusative singular of pāx, pācis (stem pāc-).' }),
+  S(7, 1, 'virginēs/S rēgīnam/O nōn/D vident/V', 'The maidens do not see the queen.', ['S:maidens|virgins|girls', 'D:\\bnot\\b|n\'t', 'V:\\bsee', 'O:queen\\b'], { note: 'virginēs: nominative plural of virgō, virginis (stem virgin-).' }),
+  S(7, 2, 'amor/S patriae/G magnus/N est/V', 'Love of country is great.', ['S:love\\b', 'G:country|fatherland|native land', 'N:great|large|important', 'V:\\bis\\b'], { alts: ['Love of the fatherland is great.'], note: 'amor is masculine, so the predicate adjective is magnus.' }),
+  S(7, 2, 'virtūtem/O hominis/G laudāmus/V', 'We praise the virtue of the man.', ['O:virtue|courage|manliness|excellence|worth', 'G:man\\b|human|person', 'S:\\bwe\\b', 'V:prais'], { alts: ['We praise the man’s virtue.', 'We praise a man’s courage.'], note: 'hominis is genitive singular of homō; virtūtem is accusative of the feminine virtūs.' }),
+  S(7, 2, 'uxor/S rēgis/G virum/O bonum/A amat/V', 'The king’s wife loves a good man.', ['S:wife\\b', 'G:king', 'A:good|kind', 'O:man\\b|hero|husband', 'V:\\blov|\\blik'], { alts: ['The wife of the king loves a good man.'], note: 'uxor is nominative; rēgis is the genitive modifying it.' }),
+  S(7, 2, 'rēx/S nōmen/O novum/A habet/V', 'The king has a new name.', ['S:king\\b', 'A:new|strange', 'O:name\\b', 'V:\\bha[sv]|possess|hold'], { note: 'nōmen is neuter: nominative and accusative are identical; novum agrees with it.' }),
+  S(7, 2, 'puella/S rēgīnae/I litterās/O dat/V', 'The girl gives the queen a letter.', ['S:girl\\b', 'I:queen\\b', 'O:letter|epistle|letters', 'V:\\bgive|offer'], { alts: ['The girl gives a letter to the queen.'], note: 'litterae (plural) = a letter, an epistle. rēgīnae is dative singular.' }),
+  S(7, 2, 'post/P bellum/PO pāx/S nōn/D erat/V', 'After the war there was no peace.', ['PO:war\\b', 'S:peace\\b', 'D:\\bnot\\b|n\'t|\\bno\\b', 'V:\\bwas\\b|\\bwere\\b'], { alts: ['After the war peace was not present.'], note: 'post takes the accusative: bellum.' }),
+  S(7, 2, 'sub/P caelō/PO/abl magnō/A hominēs/S fāmam/O habent/V', 'Under the great sky men have fame.', ['PO:sky|heaven', 'A:great|large', 'S:men\\b|people|human', 'O:fame|rumor|report|reputation', 'V:\\bha[sv]e?|possess|hold'], { note: 'sub + ablative with a verb of rest.' }),
+  S(7, 2, 'mōrēs/S rēgis/G malī/N sunt/V', 'The king’s morals are bad.', ['S:morals|habits|character|manners', 'G:king', 'N:bad|evil|wicked', 'V:\\bare\\b'], { alts: ['The morals of the king are evil.', 'The king’s character is bad.'], note: 'mōrēs, mōrum is used in the plural: “morals, character”.' }),
+  S(7, 3, 'rēx/S audet/V cīvitātem/O servāre/INF', 'The king dares to save the state.', ['S:king\\b', 'V:dare', 'INF:sav|preserv|keep|guard', 'O:state|citizenship|city'], { alts: ['The king dares to preserve the state.'], note: 'audet takes a complementary infinitive: servāre.' }),
+  S(7, 3, 'hominēs/S malī/A rēgem/O necāre/INF audent/V', 'Evil men dare to kill the king.', ['S:men\\b|people|human', 'A:evil|bad|wicked', 'O:king\\b', 'INF:kill|murder', 'V:dare'], { alts: ['Wicked men dare to murder the king.'], note: 'hominēs is nominative plural; rēgem is accusative singular.' }),
+  S(7, 3, 'cīvitās/S sine/P virtūte/PO nōn/D valet/V', 'A state without virtue is not strong.', ['S:state|citizenship', 'PO:virtue|courage|worth|excellence', 'D:\\bnot\\b|n\'t', 'V:strong|well|power'], { alts: ['A state without courage does not have power.'], note: 'sine + ablative: virtūte.' }),
+  S(7, 3, 'labor/S hominibus/I virtūtem/O dat/V', 'Work gives virtue to men.', ['S:labor|work|toil', 'I:men\\b|people|human', 'O:virtue|courage|manliness|excellence', 'V:\\bgive'], { alts: ['Labor gives men virtue.', 'Toil gives virtue to men.'], note: 'hominibus is dative plural (-ibus).' }),
+  // ───────────── Chapter 8 — third conjugation; ad, ex, dum, numquam, tamen
+  S(8, 1, 'scrībe/V', 'Write!', ['V:\\bwrite|compose'], { alts: ['Compose!'], note: 'Singular imperative of the 3rd conjugation = stem + -e.' }),
+  S(8, 1, 'discite/V', 'Learn! (to several people)', ['V:\\blearn'], { alts: ['Learn!'], note: 'Plural imperative = stem + -ite.' }),
+  S(8, 1, 'dūc/V', 'Lead!', ['V:\\blead|consider|regard'], { note: 'dūc is the irregular singular imperative of dūcō (not dūce).' }),
+  S(8, 1, 'rēx/S cōpiās/O dūcit/V', 'The king leads the troops.', ['S:king\\b', 'V:\\blead', 'O:troops|forces|supplies'], { alts: ['The king leads the forces.'], note: 'cōpiae, cōpiārum (plural) = troops, forces.' }),
+  S(8, 1, 'soror/S litterās/O scrībit/V', 'The sister writes a letter.', ['S:sister\\b', 'V:\\bwrit', 'O:letter|epistle|letters'], { note: 'scrībit: 3rd person singular present of scrībō.' }),
+  S(8, 1, 'magister/S discipulōs/O docet/V', 'The teacher teaches the students.', ['S:teacher|master', 'V:\\bteach', 'O:students|pupils|learners'], { alts: ['The teacher teaches the pupils.'], note: 'doceō is 2nd conjugation (docēre).' }),
+  S(8, 1, 'virī/S virtūtem/O discunt/V', 'The men learn virtue.', ['S:men\\b', 'V:\\blearn', 'O:virtue|courage|manliness|excellence'], { note: 'discunt: 3rd person plural, ending -unt.' }),
+  S(8, 2, 'frātrēs/S rēgem/O vincunt/V', 'The brothers conquer the king.', ['S:brothers\\b', 'V:conquer|overcome', 'O:king\\b'], { alts: ['The brothers overcome the king.'], note: 'frātrēs: nominative plural of frāter, frātris (stem frātr-).' }),
+  S(8, 2, 'cōpiae/S bellum/O gerunt/V', 'The troops wage war.', ['S:troops|forces', 'V:wage|carry on|conduct|carry|manage|perform|accomplish', 'O:war\\b'], { alts: ['The forces carry on war.'], note: 'bellum gerere = to wage war.' }),
+  S(8, 2, 'magister/S discipulōs/O ad/P rēgem/PO dūcit/V', 'The teacher leads the students to the king.', ['S:teacher|master', 'O:students|pupils|learners', 'PO:king\\b', 'V:\\blead'], { note: 'ad + accusative.' }),
+  S(8, 2, 'puerī/S librōs/O ex/P agrō/PO trahunt/V', 'The boys drag the books out of the field.', ['S:boys\\b|children', 'O:books\\b', 'PO:field|farm', 'V:drag|draw'], { alts: ['The boys draw the books from the field.'], note: 'ex + ablative: agrō.' }),
+  S(8, 2, 'ratiō/S hominēs/O docet/V', 'Reason teaches men.', ['S:reason|judgment|reckoning|account|system|method', 'O:men\\b|people|human', 'V:\\bteach'], { note: 'hominēs is accusative plural; ratiō (nominative) is feminine.' }),
+  S(8, 2, 'scrīptor/S rēgis/G victōriam/O laudat/V', 'The writer praises the king’s victory.', ['S:writer|author', 'G:king', 'O:victory', 'V:prais'], { alts: ['The author praises the victory of the king.'] }),
+  S(8, 3, 'amor/S laudis/G hominēs/O ad/P virtūtem/PO dūcit/V', 'The love of praise leads men to virtue.', ['S:love\\b', 'G:praise|glory|fame', 'O:men\\b|people|human', 'PO:virtue|courage|excellence|worth', 'V:\\blead'], { note: 'laudis is genitive singular of laus, laudis (stem laud-).' }),
+  S(8, 3, 'numquam/D victōriam/O sine/P labōre/PO habēbimus/V', 'We shall never have victory without work.', ['D:\\bnever\\b', 'O:victory', 'PO:labor|work|toil', 'S:\\bwe\\b', 'V:\\bhave\\b'], { alts: ['We will never have victory without toil.'], note: 'habēbimus: future of habeō (2nd conjugation).' }),
+  S(8, 3, 'tamen/D rēx/S cōpiās/O ad/P patriam/PO dūcet/V', 'Nevertheless the king will lead the troops to the fatherland.', ['D:nevertheless|still', 'S:king\\b', 'O:troops|forces', 'PO:fatherland|country|native land', 'V:will lead'], { alts: ['Still, the king will lead the forces to his country.'], note: 'dūcet = future (3rd conjugation, -et); compare present dūcit.' }),
+  S(8, 3, 'dum/C rēx/S cōpiās/O dūcit/V puerī/S in/P agrō/PO/abl manent/V', 'While the king leads the troops, the boys remain in the field.', ['C:\\bwhile\\b|as long as', 'S:king\\b', 'O:troops|forces', 'V:\\blead', 'S:boys\\b|children', 'PO:field|farm', 'V:remain|stay|abide'], { note: 'dum + the indicative “while”.' }),
 ];
 
 // ──────────────── English → Latin composition tasks (slot syntax in js/core/grade.js)
@@ -120,7 +155,7 @@ export const COMPOSE_DEFS = [
   E(1, 1, 'Call! (to several people)', ['voco:imp.pl'], 'Vocāte!'),
   E(1, 1, 'I do not make a mistake.', ['non', 'erro:1.sg'], 'Nōn errō.'),
   E(1, 2, 'They ought to preserve.', ['debeo:3.pl', 'conservo:inf'], 'Cōnservāre dēbent.', { alts: ['Dēbent cōnservāre.'] }),
-  E(1, 2, 'We see nothing.', ['nihil', 'video:1.pl'], 'Nihil vidēmus.'),
+  E(4, 2, 'We see nothing.', ['nihil', 'video:1.pl'], 'Nihil vidēmus.'),
   E(1, 3, 'If you (sing.) are well, I am well.', ['si', 'valeo:2.sg', 'valeo:1.sg'], 'Sī valēs, valeō.'),
   E(2, 1, 'The girl loves the rose.', ['puella:nom.sg', 'rosa:acc.sg', 'amo:3.sg'], 'Puella rosam amat.', { alts: ['Rosam puella amat.'], note: 'Subject nominative, object accusative: the order is free.' }),
   E(2, 1, 'The sailors praise the poet.', ['nauta:nom.pl', 'poeta:acc.sg', 'laudo:3.pl'], 'Nautae poētam laudant.'),
@@ -150,4 +185,13 @@ export const COMPOSE_DEFS = [
   E(6, 2, 'You (plural) will be safe.', ['salvus:nom.pl.m', 'sum:2.pl.fut'], 'Salvī eritis.'),
   E(6, 2, 'They were not able to see the books.', ['non', 'possum:3.pl.impf', 'video:inf', 'liber:acc.pl'], 'Librōs vidēre nōn poterant.'),
   E(6, 3, 'There the places will be full of dangers.', ['ibi', 'locus:nom.pl', 'plenus:nom.pl.n', 'periculum:gen.pl', 'sum:3.pl.fut'], 'Ibi loca plēna perīculōrum erunt.'),
+  E(7, 1, 'The king loves peace.', ['rex:nom.sg', 'pax:acc.sg', 'amo:3.sg'], 'Rēx pācem amat.'),
+  E(7, 2, 'The queen has a new name.', ['regina:nom.sg', 'nomen:acc.sg', 'novus:acc.sg.n', 'habeo:3.sg'], 'Rēgīna nōmen novum habet.'),
+  E(7, 2, 'The men praise the virtue of the king.', ['homo:nom.pl', 'virtus:acc.sg', 'rex:gen.sg', 'laudo:3.pl'], 'Hominēs virtūtem rēgis laudant.'),
+  E(7, 3, 'The king does not dare to kill the man.', ['rex:nom.sg', 'non', 'audeo:3.sg', 'neco:inf', 'homo:acc.sg'], 'Rēx hominem necāre nōn audet.', { alts: ['Rēx nōn audet hominem necāre.'] }),
+  E(8, 1, 'Lead! (to one person)', ['duco:imp.sg'], 'Dūc!'),
+  E(8, 1, 'We lead.', ['duco:1.pl'], 'Dūcimus.'),
+  E(8, 2, 'The writer will write a book.', ['scriptor:nom.sg', 'liber:acc.sg', 'scribo:3.sg.fut'], 'Scrīptor librum scrībet.'),
+  E(8, 2, 'The brothers conquer the king.', ['frater:nom.pl', 'rex:acc.sg', 'vinco:3.pl'], 'Frātrēs rēgem vincunt.'),
+  E(8, 3, 'The sister will not learn without work.', ['soror:nom.sg', 'non', 'sine', 'labor:abl.sg', 'disco:3.sg.fut'], 'Soror sine labōre nōn discet.', { alts: ['Soror nōn discet sine labōre.'] }),
 ];

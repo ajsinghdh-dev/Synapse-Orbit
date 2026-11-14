@@ -19,7 +19,7 @@ export default function add({ root, store }) {
   root.innerHTML = `<div class="page-head"><div><h1>Add words</h1><p>Add the words from your textbook’s vocabulary lists. Every entry is checked against the Latin morphology engine before it is accepted, then drilled like any built-in word.</p></div></div>
   <div class="tabs"><a href="#/vocabulary">Browse</a><a href="#/vocabulary/practice">Practice modes</a><a href="#/vocabulary/add" aria-current="page">Add words</a></div>
   <div class="grid g2" style="align-items:start"><section class="card col"><h3>Paste your list</h3>
-    <div class="field"><label for="dch">Default chapter (for lines without one)</label><select id="dch" class="input" style="width:auto">${[1, 2, 3, 4, 5, 6].map((n) => `<option>${n}</option>`).join('')}</select></div>
+    <div class="field"><label for="dch">Default chapter (for lines without one)</label><select id="dch" class="input" style="width:auto">${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `<option>${n}</option>`).join('')}</select></div>
     <textarea id="txt" class="input" rows="10" data-la="on" spellcheck="false" autocapitalize="off" placeholder="${esc(EXAMPLE)}" style="font-size:17px"></textarea>
     <p class="small muted mb0">Separate fields with <span class="kbd">;</span>. Copy the entry exactly as printed, <strong>with macrons</strong>. Shortened forms such as <span class="la">bonus, -a, -um</span> and <span class="la">amō, -āre, -āvī, -ātus</span> work. Only 1st/2nd-conjugation verbs and 1st/2nd-declension nouns and adjectives are accepted, because that is what Chapters 1–6 cover.</p>
     <button class="btn" id="ex">Insert examples</button></section>

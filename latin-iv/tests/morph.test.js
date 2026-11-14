@@ -31,13 +31,13 @@ test('lexicon entries are well-formed', () => {
   const ids = new Set();
   for (const w of LEXICON) {
     assert.ok(!ids.has(w.id), 'duplicate id ' + w.id); ids.add(w.id);
-    assert.ok(w.la && w.en?.length && [1, 2, 3, 4, 5, 6].includes(w.ch), w.id);
+    assert.ok(w.la && w.en?.length && [1, 2, 3, 4, 5, 6, 7, 8].includes(w.ch), w.id);
     assert.ok(['core', 'check'].includes(w.conf), w.id + ' conf');
     if (w.pos === 'verb') {
       assert.equal(w.pp[0], w.la);
       if (w.irreg !== 'sum' && w.irreg !== 'possum') {
-        assert.ok(w.pp[1].endsWith(w.irreg === 'do' ? 'are' : w.conj === 1 ? 'āre' : 'ēre'), w.id + ' infinitive vs conjugation');
-        if (w.irreg !== 'do') assert.equal(strip(w.pp[1]).slice(0, -3) + (w.conj === 1 ? 'o' : 'eo'), strip(w.la), w.id + ' stem vs 1st pp');
+        assert.ok(w.pp[1].endsWith(w.irreg === 'do' ? 'are' : w.conj === 1 ? 'āre' : w.conj === 2 ? 'ēre' : 'ere'), w.id + ' infinitive vs conjugation');
+        if (w.irreg !== 'do') assert.equal(strip(w.pp[1]).slice(0, -3) + (w.conj === 2 ? 'eo' : 'o'), strip(w.la), w.id + ' stem vs 1st pp');
       }
     }
     if (w.pos === 'noun') {
@@ -64,7 +64,7 @@ test('Wheelock-specific facts', () => {
   assert.deepEqual(BY_ID.iuvo.pp, ['iuvō', 'iuvāre', 'iūvī', 'iūtum']);
   assert.deepEqual(declineAdj(BY_ID.meus).m.sg.voc, ['mī']);
   assert.equal(declineNoun(BY_ID.filius).sg.voc[0], 'fīlī');
-  for (const id of ['porto', 'pugno', 'navigo', 'regina', 'dominus', 'servus', 'oppidum', 'ad', 'cum', 'e', 'a']) assert.ok(!BY_ID[id], id + ' is not Chapter 1–4 vocabulary');
+  for (const id of ['porto', 'pugno', 'navigo', 'dominus', 'servus', 'oppidum', 'cum', 'a']) assert.ok(!BY_ID[id], id + ' is not Chapter 1–4 vocabulary');
   for (const id of ['cogito', 'erro', 'salveo', 'conservo', 'philosophia', 'sapientia', 'stultus', 'verus', 'sine', 'nihil']) assert.ok(BY_ID[id], id + ' is Chapter 1–4 vocabulary');
 });
 
@@ -98,4 +98,34 @@ test('Chapter 5–6 forms match hand-typed tables', async () => {
   assert.deepEqual(['nom', 'gen', 'acc', 'abl'].map((c) => declineNoun(BY_ID.insidiae).pl[c][0]), ['īnsidiae', 'īnsidiārum', 'īnsidiās', 'īnsidiīs']);
   assert.equal(declineNoun(BY_ID.liber).sg.gen[0], 'librī');
   assert.deepEqual(BY_ID.possum.pp, ['possum', 'posse', 'potuī', null]);
+});
+
+test('Chapter 7–8 forms match hand-typed tables (third declension, third conjugation, deus)', () => {
+  const nd = (id) => declineNoun(BY_ID[id]);
+  const row = (id, num) => CASES.map((c) => nd(id)[num][c][0]);
+  assert.deepEqual(row('rex', 'sg'), ['rēx', 'rēgis', 'rēgī', 'rēgem', 'rēge', 'rēx']);
+  assert.deepEqual(row('rex', 'pl'), ['rēgēs', 'rēgum', 'rēgibus', 'rēgēs', 'rēgibus', 'rēgēs']);
+  assert.deepEqual(row('homo', 'sg'), ['homō', 'hominis', 'hominī', 'hominem', 'homine', 'homō']);
+  assert.deepEqual(row('nomen', 'sg'), ['nōmen', 'nōminis', 'nōminī', 'nōmen', 'nōmine', 'nōmen']);
+  assert.deepEqual(row('nomen', 'pl'), ['nōmina', 'nōminum', 'nōminibus', 'nōmina', 'nōminibus', 'nōmina']);
+  assert.deepEqual(row('corpus', 'pl'), ['corpora', 'corporum', 'corporibus', 'corpora', 'corporibus', 'corpora']);
+  assert.deepEqual(row('pax', 'sg'), ['pāx', 'pācis', 'pācī', 'pācem', 'pāce', 'pāx']);
+  assert.deepEqual(nd('deus').sg.nom.concat(nd('deus').sg.gen, nd('deus').sg.acc), ['deus', 'deī', 'deum']);
+  assert.deepEqual(nd('deus').pl.gen, ['deōrum', 'deum']);
+  const c = (id) => conjugate(BY_ID[id]);
+  assert.deepEqual(c('duco').ind, ['dūcō', 'dūcis', 'dūcit', 'dūcimus', 'dūcitis', 'dūcunt']);
+  assert.deepEqual(c('duco').fut, ['dūcam', 'dūcēs', 'dūcet', 'dūcēmus', 'dūcētis', 'dūcent']);
+  assert.equal(c('duco').inf, 'dūcere'); assert.equal(c('duco').impSg, 'dūc'); assert.equal(c('duco').impPl, 'dūcite');
+  assert.equal(c('scribo').impSg, 'scrībe'); assert.equal(c('scribo').impPl, 'scrībite');
+  assert.deepEqual(c('ago').fut, ['agam', 'agēs', 'aget', 'agēmus', 'agētis', 'agent']);
+  assert.equal(c('duco').impf, null, 'no 3rd-conjugation imperfect before Chapter 9');
+  assert.equal(c('doceo').inf, 'docēre', 'doceō is 2nd conjugation');
+  assert.deepEqual(BY_ID.audeo.pp, ['audeō', 'audēre', 'ausus sum', null]);
+});
+
+test('vocabulary lists contain exactly the official Wheelock chapter counts', () => {
+  const n = (ch) => LEXICON.filter((w) => w.ch === ch).length;
+  assert.deepEqual([1, 2, 3, 4].map(n), [14, 24, 21, 26]);
+  for (const id of ['non', 'si', 'quid', 'saepe', 'interim', 'locus', 'morbus']) assert.ok(!LEXICON.some((w) => w.id === id), id + ' is not on a Wheelock vocabulary list (support word only)');
+  for (const id of ['hodie', 'semper', 'adulescentia', 'animus', 'cenO'.toLowerCase(), 'culpo', 'deus', 'dea', 'discipulus', 'regina', 'frater', 'duco']) assert.ok(BY_ID[id], id + ' must be present');
 });
